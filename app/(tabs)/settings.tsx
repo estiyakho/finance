@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
-import { Sun, Smartphone, Palette, Clock, Calendar, Bell, Layers } from 'lucide-react-native';
+import { StyleSheet, View, Text, ScrollView, Alert } from 'react-native';
+import { Sun, Smartphone, Palette, Clock, Calendar, Bell, Layers, Trash2 } from 'lucide-react-native';
 import SettingRow from '@/components/SettingRow';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -9,6 +9,17 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
   const [isAmoled, setIsAmoled] = useState(true);
+
+  const handleReset = () => {
+    Alert.alert(
+      "Reset Categories",
+      "Are you sure you want to reset all categories to default?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Reset", style: "destructive", onPress: () => console.log("Reset Categories") }
+      ]
+    );
+  };
 
   return (
     <ScrollView 
@@ -40,6 +51,16 @@ export default function SettingsScreen() {
       <View style={[styles.card, { backgroundColor: theme.card }]}>
         <SettingRow icon={Layers} label="Default Screen" value="Overview" isLast={true} />
       </View>
+
+      <Text style={[styles.sectionHeader, { color: theme.error }]}>Danger Zone</Text>
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
+        <SettingRow 
+          icon={Trash2} 
+          label="Reset Categories" 
+          onPress={handleReset}
+          isLast={true}
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -65,7 +86,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 24,
     overflow: 'hidden',
-    // Apply a subtle border as seen in some professional AMOLED designs
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.05)',
   },
