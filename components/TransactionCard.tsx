@@ -42,12 +42,12 @@ export default function TransactionCard({ title, amount, type, date, currency, o
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
+    borderRadius: 12,
     padding: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
     borderWidth: 1,
   },
   leftSection: {

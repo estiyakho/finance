@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 12,
     paddingHorizontal: 18,
     marginTop: 8,
     marginBottom: 10,
