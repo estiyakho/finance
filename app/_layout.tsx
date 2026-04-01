@@ -23,6 +23,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
+    MartianMono: require('@expo-google-fonts/martian-mono/400Regular/MartianMono_400Regular.ttf'),
+    'MartianMono-Bold': require('@expo-google-fonts/martian-mono/700Bold/MartianMono_700Bold.ttf'),
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });

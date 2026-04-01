@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface Transaction {
   id: string;
@@ -16,6 +16,7 @@ interface FinanceState {
   currency: string;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
+  updateTransaction: (id: string, updates: Partial<Omit<Transaction, 'id'>>) => void;
   setCurrency: (currency: string) => void;
   getTotalBalance: () => number;
   getTotalIncome: () => number;
@@ -40,6 +41,9 @@ export const useFinanceStore = create<FinanceState>()(
       })),
       deleteTransaction: (id) => set((state) => ({
         transactions: state.transactions.filter((t) => t.id !== id)
+      })),
+      updateTransaction: (id, updates) => set((state) => ({
+        transactions: state.transactions.map((t) => t.id === id ? { ...t, ...updates } : t)
       })),
       setCurrency: (currency) => set({ currency }),
       getTotalBalance: () => {

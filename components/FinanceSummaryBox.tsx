@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface FinanceSummaryBoxProps {
   balance: number;
@@ -21,9 +21,9 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
           <Text style={styles.amountMain}>{`${currency} ${balance.toLocaleString()}`}</Text>
         </View>
       </View>
-      
+
       <View style={styles.divider} />
-      
+
       <View style={styles.bottomSection}>
         <View style={styles.statBox}>
           <Text style={styles.statAmount}>{`${currency} ${income.toLocaleString()}`}</Text>
@@ -66,45 +66,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 12,
-    color: '#888',
+    fontSize: 10,
+    color: '#666',
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
     marginBottom: 4,
+    fontFamily: 'MartianMono',
   },
   amountMain: {
-    fontSize: 24,
-    fontWeight: '900',
+    fontSize: 22,
+    fontFamily: 'MartianMono-Bold',
     color: '#FFF',
   },
   divider: {
     height: 1,
-    backgroundColor: '#2A2A2A',
-    marginBottom: 16,
+    backgroundColor: '#111',
+    marginVertical: 16,
   },
   bottomSection: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   statBox: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   statAmount: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'MartianMono-Bold',
+    color: '#EEE',
     marginBottom: 2,
   },
   statLabel: {
-    fontSize: 10,
-    color: '#888',
+    fontSize: 9,
+    fontFamily: 'MartianMono',
+    color: '#666',
     textTransform: 'uppercase',
   },
   verticalDivider: {
     width: 1,
-    height: 30,
-    backgroundColor: '#2A2A2A',
+    height: 24,
+    backgroundColor: '#111',
   },
 });

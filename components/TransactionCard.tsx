@@ -9,7 +9,7 @@ interface TransactionCardProps extends Transaction {
   currency: string;
 }
 
-export default function TransactionCard({ title, amount, type, date, time, onDelete, currency }: TransactionCardProps) {
+export default function TransactionCard({ title, amount, type, date, onDelete, currency }: TransactionCardProps) {
   const isExpense = type === 'expense';
   const amountColor = isExpense ? '#FF5252' : '#4CAF50';
   const prefix = isExpense ? '-' : '';
@@ -20,10 +20,7 @@ export default function TransactionCard({ title, amount, type, date, time, onDel
         <View style={styles.radioPlaceholder} />
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
-          <View style={styles.timeContainer}>
-            <Ionicons name="time-outline" size={10} color="#666" style={styles.timeIcon} />
-            <Text style={styles.timeText}>{`${date}, ${time}`}</Text>
-          </View>
+          <Text style={styles.dateText}>{date}</Text>
         </View>
       </View>
 
@@ -32,7 +29,7 @@ export default function TransactionCard({ title, amount, type, date, time, onDel
           {`${prefix}${currency} ${amount.toLocaleString()}`}
         </Text>
         <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-          <Ionicons name="trash-outline" size={14} color="#FF5252" />
+          <Ionicons name="trash-outline" size={16} color="#FF5252" />
         </TouchableOpacity>
       </View>
     </View>
@@ -41,59 +38,63 @@ export default function TransactionCard({ title, amount, type, date, time, onDel
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#161616',
-    borderRadius: 12,
-    padding: 10,
+    backgroundColor: '#0A0A0A',
+    borderRadius: 16,
+    padding: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: '#111',
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    flex: 2,
+    backgroundColor: 'transparent',
   },
   radioPlaceholder: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     borderWidth: 1.5,
     borderColor: '#333',
-    marginRight: 10,
+    marginRight: 14,
   },
   textContainer: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
   title: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#EEE',
-    marginBottom: 2,
+    fontSize: 13,
+    fontFamily: 'MartianMono-Bold',
+    color: '#FFF',
+    marginBottom: 4,
   },
-  timeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timeIcon: {
-    marginRight: 4,
-  },
-  timeText: {
+  dateText: {
     fontSize: 10,
+    fontFamily: 'MartianMono',
     color: '#666',
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
+    backgroundColor: 'transparent',
   },
   amount: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: 'MartianMono-Bold',
   },
   deleteButton: {
-    padding: 4,
+    backgroundColor: '#1E1414',
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2A1A1A',
   },
 });

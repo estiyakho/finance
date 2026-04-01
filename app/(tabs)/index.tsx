@@ -1,49 +1,93 @@
-import React from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { Text, View } from '@/components/Themed';
-import { Ionicons } from '@expo/vector-icons';
-import TransactionCard from '@/components/TransactionCard';
+import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
+import EditTransactionModal from '@/components/EditTransactionModal';
 import FinanceSummaryBox from '@/components/FinanceSummaryBox';
-import { useFinanceStore } from '@/store/useFinanceStore';
+import { View } from '@/components/Themed';
+import TransactionCard from '@/components/TransactionCard';
+import { Transaction, useFinanceStore } from '@/store/useFinanceStore';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useMemo, useState } from 'react';
+import { FlatList, SafeAreaView, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
 export default function TransactionsScreen() {
-  const { 
-    transactions, 
-    currency, 
-    addTransaction, 
+  const {
+    transactions,
+    currency,
+    addTransaction,
     deleteTransaction,
+    updateTransaction,
     getTotalBalance,
     getTotalIncome,
     getTotalExpense
   } = useFinanceStore();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteTransactionId, setDeleteTransactionId] = useState<string | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(t =>
+      t.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [transactions, searchQuery]);
+
   const handleAddTransaction = () => {
-    // For now, we'll add a mock transaction to demonstrate functionality
-    // In a real app, this would open a modal with a form
-    addTransaction({
-      title: 'New Transaction',
-      amount: Math.floor(Math.random() * 1000) + 50,
-      type: Math.random() > 0.5 ? 'income' : 'expense',
+    const newTx: Omit<Transaction, 'id'> = {
+      title: 'New Entry',
+      amount: 0,
+      type: 'expense',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-    });
+    };
+    addTransaction(newTx);
   };
 
-  const handleDelete = (id: string, title: string) => {
-    Alert.alert(
-      "Delete Transaction",
-      `Are you sure you want to delete "${title}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => deleteTransaction(id) }
-      ]
-    );
+  const handleEditPress = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setEditModalVisible(true);
   };
+
+  const handleSaveEdit = (id: string, updates: Partial<Transaction>) => {
+    updateTransaction(id, updates);
+  };
+
+  const confirmDelete = (id: string) => {
+    setDeleteTransactionId(id);
+    setDeleteModalVisible(true);
+  };
+
+  const handleDelete = () => {
+    if (deleteTransactionId) {
+      deleteTransaction(deleteTransactionId);
+      setDeleteTransactionId(null);
+    }
+  };
+
+  const deletingTransactionTitle = useMemo(() => {
+    return transactions.find(t => t.id === deleteTransactionId)?.title || '';
+  }, [transactions, deleteTransactionId]);
 
   return (
-    <View style={[styles.container, { backgroundColor: '#000' }]}>
-      <View style={styles.header}>
-        <FinanceSummaryBox 
+    <SafeAreaView style={[styles.container, { backgroundColor: '#000' }]}>
+      <View style={styles.topContainer}>
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={18} color="#666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search transactions..."
+            placeholderTextColor="#444"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={18} color="#666" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <FinanceSummaryBox
           balance={getTotalBalance()}
           income={getTotalIncome()}
           expense={getTotalExpense()}
@@ -52,14 +96,16 @@ export default function TransactionsScreen() {
       </View>
 
       <FlatList
-        data={transactions}
+        data={filteredTransactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TransactionCard
-            {...item}
-            currency={currency}
-            onDelete={() => handleDelete(item.id, item.title)}
-          />
+          <TouchableOpacity onPress={() => handleEditPress(item)} activeOpacity={0.7}>
+            <TransactionCard
+              {...item}
+              currency={currency}
+              onDelete={() => confirmDelete(item.id)}
+            />
+          </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
@@ -68,7 +114,22 @@ export default function TransactionsScreen() {
       <TouchableOpacity style={styles.fab} onPress={handleAddTransaction}>
         <Ionicons name="add" size={32} color="#FFF" />
       </TouchableOpacity>
-    </View>
+
+      <EditTransactionModal
+        visible={editModalVisible}
+        transaction={editingTransaction}
+        onClose={() => setEditModalVisible(false)}
+        onSave={handleSaveEdit}
+        onDelete={confirmDelete}
+      />
+
+      <DeleteConfirmationModal
+        visible={deleteModalVisible}
+        title={deletingTransactionTitle}
+        onClose={() => setDeleteModalVisible(false)}
+        onConfirm={handleDelete}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -76,10 +137,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingTop: 10,
+  topContainer: {
     paddingHorizontal: 16,
     backgroundColor: '#000',
+    paddingBottom: 12,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0A0A0A',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    marginTop: 10,
+    marginBottom: 20,
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#111',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#FFF',
+    fontFamily: 'MartianMono',
+    fontSize: 13,
   },
   listContent: {
     paddingHorizontal: 16,
@@ -89,9 +171,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#00AEEF',
     justifyContent: 'center',
     alignItems: 'center',
