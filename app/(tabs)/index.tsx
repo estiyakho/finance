@@ -1,43 +1,71 @@
 import React from 'react';
-import { StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import TransactionCard from '@/components/TransactionCard';
-
-const MOCK_TRANSACTIONS = [
-  { id: '1', title: 'Loan(Ammu)', amount: '1,000.0', type: 'expense', date: 'Apr 1', time: '7:28 AM' },
-  { id: '2', title: 'syed', amount: '4,000.0', type: 'income', date: 'Apr 1', time: '7:27 AM' },
-  { id: '3', title: 'Fare(Kaptai Raster matha)', amount: '70.0', type: 'expense', date: 'Mar 31', time: '1:55 PM' },
-  { id: '4', title: 'Previous month remaining', amount: '265.0', type: 'income', date: 'Mar 31', time: '1:56 PM' },
-  { id: '5', title: 'Advance accounting 2', amount: '1,500.0', type: 'expense', date: 'Mar 31', time: '2:00 PM' },
-  { id: '6', title: 'Organizational Behaviour', amount: '500.0', type: 'expense', date: 'Mar 31', time: '2:10 PM' },
-];
+import FinanceSummaryBox from '@/components/FinanceSummaryBox';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
 export default function TransactionsScreen() {
+  const { 
+    transactions, 
+    currency, 
+    addTransaction, 
+    deleteTransaction,
+    getTotalBalance,
+    getTotalIncome,
+    getTotalExpense
+  } = useFinanceStore();
+
+  const handleAddTransaction = () => {
+    // For now, we'll add a mock transaction to demonstrate functionality
+    // In a real app, this would open a modal with a form
+    addTransaction({
+      title: 'New Transaction',
+      amount: Math.floor(Math.random() * 1000) + 50,
+      type: Math.random() > 0.5 ? 'income' : 'expense',
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    });
+  };
+
+  const handleDelete = (id: string, title: string) => {
+    Alert.alert(
+      "Delete Transaction",
+      `Are you sure you want to delete "${title}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deleteTransaction(id) }
+      ]
+    );
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: '#121212' }]}>
+    <View style={[styles.container, { backgroundColor: '#000' }]}>
       <View style={styles.header}>
-        <Text style={styles.balanceLabel}>Balance</Text>
-        <Text style={styles.balanceValue}>BDT 3,195.0</Text>
+        <FinanceSummaryBox 
+          balance={getTotalBalance()}
+          income={getTotalIncome()}
+          expense={getTotalExpense()}
+          currency={currency}
+        />
       </View>
 
       <FlatList
-        data={MOCK_TRANSACTIONS}
+        data={transactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TransactionCard
-            title={item.title}
-            amount={item.amount}
-            type={item.type as 'income' | 'expense'}
-            date={item.date}
-            time={item.time}
+            {...item}
+            currency={currency}
+            onDelete={() => handleDelete(item.id, item.title)}
           />
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.fab}>
+      <TouchableOpacity style={styles.fab} onPress={handleAddTransaction}>
         <Ionicons name="add" size={32} color="#FFF" />
       </TouchableOpacity>
     </View>
@@ -49,36 +77,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#1E1E2E',
-    paddingVertical: 32,
-    alignItems: 'center',
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#2A2A3A',
-  },
-  balanceLabel: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  balanceValue: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 0.5,
+    paddingTop: 10,
+    paddingHorizontal: 16,
+    backgroundColor: '#000',
   },
   listContent: {
-    padding: 16,
+    paddingHorizontal: 16,
     paddingBottom: 100,
   },
   fab: {
     position: 'absolute',
     right: 24,
     bottom: 24,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#00AEEF',
     justifyContent: 'center',
     alignItems: 'center',

@@ -1,49 +1,78 @@
 import React from 'react';
-import { StyleSheet, SectionList } from 'react-native';
+import { StyleSheet, SectionList, TouchableOpacity, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
-const SETTINGS_SECTIONS = [
-  {
-    title: 'Appearance',
-    data: [
-      { id: 'theme', label: 'Theme', value: 'Dark', icon: 'sunny-outline' },
-      { id: 'amoled', label: 'AMOLED Theme', type: 'toggle', value: true, icon: 'tablet-portrait-outline' },
-      { id: 'accent', label: 'Accent Color', type: 'color', value: '#00AEEF', icon: 'color-palette-outline' },
-    ],
-  },
-  {
-    title: 'Date & Time',
-    data: [
-      { id: 'format', label: 'Time Format', value: '12-Hour', icon: 'time-outline' },
-      { id: 'start_day', label: 'First Day of the Week', value: 'Saturday', icon: 'calendar-outline' },
-      { id: 'snooze', label: 'Snooze Duration', value: '10 min', icon: 'alarm-outline' },
-    ],
-  },
-  {
-    title: 'App Preferences',
-    data: [
-      { id: 'default_screen', label: 'Default Screen', value: 'All Transactions', icon: 'layers-outline' },
-    ],
-  },
-];
+const CURRENCIES = ['BDT', 'USD', 'EUR', 'GBP', 'INR', 'JPY'];
+
+interface SettingsItem {
+  id: string;
+  label: string;
+  value: string | boolean;
+  icon: string;
+  type?: string;
+  onPress?: () => void;
+}
+
+interface SettingsSection {
+  title: string;
+  data: SettingsItem[];
+}
 
 export default function SettingsScreen() {
-  const colorScheme = useColorScheme();
-  const themeColors = Colors[colorScheme ?? 'dark'];
+  const { currency, setCurrency } = useFinanceStore();
+
+  const handleCurrencyChange = () => {
+    Alert.alert(
+      "Select Currency",
+      "Choose your preferred currency",
+      CURRENCIES.map(curr => ({
+        text: curr,
+        onPress: () => setCurrency(curr)
+      })),
+      { cancelable: true }
+    );
+  };
+
+  const SETTINGS_SECTIONS: SettingsSection[] = [
+    {
+      title: 'Appearance',
+      data: [
+        { id: 'theme', label: 'Theme', value: 'Dark', icon: 'sunny-outline', type: 'text' },
+        { id: 'amoled', label: 'AMOLED Theme', type: 'toggle', value: true, icon: 'tablet-portrait-outline' },
+        { id: 'accent', label: 'Accent Color', type: 'color', value: '#00AEEF', icon: 'color-palette-outline' },
+      ],
+    },
+    {
+      title: 'Preferences',
+      data: [
+        { id: 'currency', label: 'Currency', value: currency, icon: 'cash-outline', onPress: handleCurrencyChange, type: 'text' },
+        { id: 'format', label: 'Time Format', value: '12-Hour', icon: 'time-outline', type: 'text' },
+      ],
+    },
+    {
+      title: 'App Preferences',
+      data: [
+        { id: 'default_screen', label: 'Default Screen', value: 'Transactions', icon: 'layers-outline', type: 'text' },
+      ],
+    },
+  ];
 
   return (
-    <View style={[styles.container, { backgroundColor: '#121212' }]}>
+    <View style={[styles.container, { backgroundColor: '#000' }]}>
       <SectionList
         sections={SETTINGS_SECTIONS}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={[styles.item, { backgroundColor: '#1E1E1E' }]}>
+          <TouchableOpacity 
+            style={[styles.item, { backgroundColor: '#111' }]} 
+            onPress={item.onPress}
+            disabled={!item.onPress && !item.type}
+          >
             <View style={styles.itemLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: '#252525' }]}>
-                <Ionicons name={item.icon as any} size={20} color={item.id === 'accent' ? '#00AEEF' : '#888'} />
+              <View style={[styles.iconContainer, { backgroundColor: '#1A1A1A' }]}>
+                <Ionicons name={item.icon as any} size={18} color={item.id === 'accent' ? '#00AEEF' : '#666'} />
               </View>
               <Text style={styles.itemLabel}>{item.label}</Text>
             </View>
@@ -53,21 +82,22 @@ export default function SettingsScreen() {
               ) : item.type === 'color' ? (
                 <View style={styles.colorValue}>
                   <View style={[styles.colorDot, { backgroundColor: item.value as string }]} />
-                  <Ionicons name="chevron-forward" size={18} color="#888" />
+                  <Ionicons name="chevron-forward" size={16} color="#444" />
                 </View>
               ) : (
                 <View style={styles.textValue}>
                   <Text style={styles.itemValue}>{item.value}</Text>
-                  <Ionicons name="chevron-forward" size={18} color="#888" />
+                  <Ionicons name="chevron-forward" size={16} color="#444" />
                 </View>
               )}
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.sectionHeader}>{title}</Text>
         )}
         contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -80,39 +110,43 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
+    paddingBottom: 40,
   },
   sectionHeader: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: '#00AEEF',
-    marginTop: 24,
-    marginBottom: 12,
-    letterSpacing: 0.5,
+    marginTop: 20,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginVertical: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    marginVertical: 3,
+    borderWidth: 1,
+    borderColor: '#1A1A1A',
   },
   itemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   itemLabel: {
-    fontSize: 16,
-    color: '#FFF',
+    fontSize: 14,
+    color: '#DDD',
     fontWeight: '500',
   },
   itemRight: {
@@ -124,25 +158,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemValue: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: 13,
+    color: '#666',
     marginRight: 4,
   },
   toggle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#444',
+    borderColor: '#333',
   },
   colorValue: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   colorDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     marginRight: 4,
   },
 });

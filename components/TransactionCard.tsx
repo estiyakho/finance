@@ -2,16 +2,14 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface TransactionCardProps {
-  title: string;
-  amount: string;
-  type: 'income' | 'expense';
-  date: string;
-  time: string;
+import { Transaction } from '@/store/useFinanceStore';
+
+interface TransactionCardProps extends Transaction {
   onDelete?: () => void;
+  currency: string;
 }
 
-export default function TransactionCard({ title, amount, type, date, time, onDelete }: TransactionCardProps) {
+export default function TransactionCard({ title, amount, type, date, time, onDelete, currency }: TransactionCardProps) {
   const isExpense = type === 'expense';
   const amountColor = isExpense ? '#FF5252' : '#4CAF50';
   const prefix = isExpense ? '-' : '';
@@ -23,24 +21,19 @@ export default function TransactionCard({ title, amount, type, date, time, onDel
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
           <View style={styles.timeContainer}>
-            <Ionicons name="time-outline" size={12} color="#888" style={styles.timeIcon} />
+            <Ionicons name="time-outline" size={10} color="#666" style={styles.timeIcon} />
             <Text style={styles.timeText}>{`${date}, ${time}`}</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.rightSection}>
-        <View style={styles.amountContainer}>
-          <Text style={[styles.amount, { color: amountColor }]}>
-            {`${prefix}BDT${amount}`}
-          </Text>
-        </View>
+        <Text style={[styles.amount, { color: amountColor }]}>
+          {`${prefix}${currency} ${amount.toLocaleString()}`}
+        </Text>
         <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-          <Ionicons name="trash-outline" size={18} color="#FF5252" />
+          <Ionicons name="trash-outline" size={14} color="#FF5252" />
         </TouchableOpacity>
-        <View style={styles.naBadge}>
-          <Text style={styles.naText}>N/A</Text>
-        </View>
       </View>
     </View>
   );
@@ -48,15 +41,15 @@ export default function TransactionCard({ title, amount, type, date, time, onDel
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: '#161616',
+    borderRadius: 12,
+    padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
+    borderColor: '#222',
   },
   leftSection: {
     flexDirection: 'row',
@@ -64,21 +57,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   radioPlaceholder: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
     borderColor: '#333',
-    marginRight: 12,
+    marginRight: 10,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#FFF',
-    marginBottom: 4,
+    color: '#EEE',
+    marginBottom: 2,
   },
   timeContainer: {
     flexDirection: 'row',
@@ -88,37 +81,19 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   timeText: {
-    fontSize: 12,
-    color: '#888',
+    fontSize: 10,
+    color: '#666',
   },
   rightSection: {
-    alignItems: 'flex-end',
-    minWidth: 100,
-  },
-  amountContainer: {
-    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   amount: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   deleteButton: {
-    backgroundColor: '#2A1A1A',
-    padding: 6,
-    borderRadius: 8,
-    marginBottom: 4,
-  },
-  naBadge: {
-    backgroundColor: '#252525',
-    paddingHorizontal: 12,
-    paddingVertical: 2,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#333',
-  },
-  naText: {
-    fontSize: 10,
-    color: '#888',
-    fontWeight: 'bold',
+    padding: 4,
   },
 });
