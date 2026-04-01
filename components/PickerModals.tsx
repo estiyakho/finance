@@ -4,6 +4,7 @@ import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
 import CoreModal from './CoreModal';
+import Colors from '@/constants/Colors';
 
 interface PickerProps {
   visible: boolean;
@@ -11,7 +12,7 @@ interface PickerProps {
 }
 
 export function CurrencyPickerModal({ visible, onClose }: PickerProps) {
-  const { currency, setCurrency, language, accentColor } = useFinanceStore();
+  const { currency, setCurrency, language, accentColor, themeMode } = useFinanceStore();
   const currencies = ['BDT', 'USD', 'EUR', 'GBP', 'INR', 'JPY', 'CAD', 'AUD'];
   const labels = LABELS[language];
 
@@ -30,7 +31,7 @@ export function CurrencyPickerModal({ visible, onClose }: PickerProps) {
               onClose();
             }}
           >
-            <Text style={[styles.gridText, currency === curr && { color: accentColor }]}>{curr}</Text>
+            <Text style={[styles.gridText, { color: Colors[themeMode].textSecondary }, currency === curr && { color: accentColor }]}>{curr}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -39,7 +40,7 @@ export function CurrencyPickerModal({ visible, onClose }: PickerProps) {
 }
 
 export function LanguagePickerModal({ visible, onClose }: PickerProps) {
-  const { language, setLanguage, accentColor } = useFinanceStore();
+  const { language, setLanguage, accentColor, themeMode } = useFinanceStore();
   const labels = LABELS[language];
   const options = [
     { code: 'en', label: 'English', sub: 'English' },
@@ -62,8 +63,8 @@ export function LanguagePickerModal({ visible, onClose }: PickerProps) {
             }}
           >
             <DefaultView>
-              <Text style={[styles.listText, language === opt.code && { color: accentColor }]}>{opt.label}</Text>
-              <Text style={styles.listSubText}>{opt.sub}</Text>
+              <Text style={[styles.listText, { color: Colors[themeMode].text }, language === opt.code && { color: accentColor }]}>{opt.label}</Text>
+              <Text style={[styles.listSubText, { color: Colors[themeMode].textSecondary }]}>{opt.sub}</Text>
             </DefaultView>
             {language === opt.code && <Ionicons name="checkmark" size={20} color={accentColor} />}
           </TouchableOpacity>
@@ -121,7 +122,7 @@ export function ExpenseColorPickerModal(props: PickerProps) {
 }
 
 export function ThemePickerModal({ visible, onClose }: PickerProps) {
-  const { themeMode, setThemeMode, language, accentColor } = useFinanceStore();
+  const { themeMode: currentThemeMode, setThemeMode, language, accentColor } = useFinanceStore();
   const labels = LABELS[language];
   const options: { code: ThemeMode; label: string; icon: string }[] = [
     { code: 'light', label: labels.light, icon: 'sunny-outline' },
@@ -137,23 +138,24 @@ export function ThemePickerModal({ visible, onClose }: PickerProps) {
             key={opt.code}
             style={[
               styles.listItem,
-              themeMode === opt.code && { backgroundColor: `${accentColor}10` }
+              { borderColor: Colors[currentThemeMode].border },
+              currentThemeMode === opt.code && { backgroundColor: `${accentColor}10` }
             ]}
             onPress={() => {
               setThemeMode(opt.code);
               onClose();
             }}
           >
-            <DefaultView style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <DefaultView style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent' }}>
               <Ionicons 
                 name={opt.icon as any} 
                 size={20} 
-                color={themeMode === opt.code ? accentColor : '#888'} 
+                color={currentThemeMode === opt.code ? accentColor : Colors[currentThemeMode].textSecondary} 
                 style={{ marginRight: 12 }} 
               />
-              <Text style={[styles.listText, themeMode === opt.code && { color: accentColor }]}>{opt.label}</Text>
+              <Text style={[styles.listText, { color: Colors[currentThemeMode].text }, currentThemeMode === opt.code && { color: accentColor }]}>{opt.label}</Text>
             </DefaultView>
-            {themeMode === opt.code && <Ionicons name="checkmark" size={20} color={accentColor} />}
+            {currentThemeMode === opt.code && <Ionicons name="checkmark" size={20} color={accentColor} />}
           </TouchableOpacity>
         ))}
       </DefaultView>
@@ -162,22 +164,26 @@ export function ThemePickerModal({ visible, onClose }: PickerProps) {
 }
 
 export function ResetConfirmationModal({ visible, onClose }: PickerProps) {
-  const { resetData, language, accentColor } = useFinanceStore();
+  const { resetData, language, accentColor, themeMode, expenseColor } = useFinanceStore();
   const labels = LABELS[language];
+  const themeColors = Colors[themeMode];
 
   return (
     <CoreModal visible={visible} onClose={onClose} title={labels.resetData}>
       <DefaultView style={styles.confirmBody}>
-        <DefaultView style={styles.warningIcon}>
-          <Ionicons name="warning-outline" size={40} color="#FF5252" />
+        <DefaultView style={[styles.warningIcon, { backgroundColor: `${expenseColor}20`, borderColor: `${expenseColor}40` }]}>
+          <Ionicons name="warning-outline" size={40} color={expenseColor} />
         </DefaultView>
-        <Text style={styles.confirmText}>{labels.confirmDelete}</Text>
+        <Text style={[styles.confirmText, { color: themeColors.text }]}>{labels.confirmDelete}</Text>
         <DefaultView style={styles.actions}>
-          <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-            <Text style={styles.cancelBtnText}>{labels.cancel}</Text>
+          <TouchableOpacity 
+            style={[styles.cancelBtn, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
+            onPress={onClose}
+          >
+            <Text style={[styles.cancelBtnText, { color: themeColors.textSecondary }]}>{labels.cancel}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
-            style={[styles.confirmBtn, { backgroundColor: '#FF5252' }]} 
+            style={[styles.confirmBtn, { backgroundColor: expenseColor }]} 
             onPress={() => {
               resetData();
               onClose();

@@ -4,6 +4,8 @@ import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
 
+import Colors from '@/constants/Colors';
+
 interface CoreModalProps {
   visible: boolean;
   onClose: () => void;
@@ -12,8 +14,9 @@ interface CoreModalProps {
 }
 
 export default function CoreModal({ visible, onClose, title, children }: CoreModalProps) {
-  const { language } = useFinanceStore();
+  const { themeMode, language } = useFinanceStore();
   const labels = LABELS[language];
+  const themeColors = Colors[themeMode];
 
   return (
     <Modal
@@ -23,16 +26,16 @@ export default function CoreModal({ visible, onClose, title, children }: CoreMod
       onRequestClose={onClose}
     >
       <TouchableOpacity 
-        style={styles.overlay} 
+        style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 
         activeOpacity={1} 
         onPress={onClose}
       >
         <DefaultView style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: themeColors.background, borderColor: themeColors.border }]}>
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>{title}</Text>
+              <Text style={[styles.headerTitle, { color: themeColors.text }]}>{title}</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Ionicons name="close" size={20} color="#666" />
+                <Ionicons name="close" size={20} color={themeColors.textSecondary} />
               </TouchableOpacity>
             </View>
             <View style={styles.body}>

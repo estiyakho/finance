@@ -2,6 +2,8 @@ import React from 'react';
 import { StyleSheet, Modal, TouchableOpacity, View as DefaultView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
+import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
 
 interface DeleteConfirmationModalProps {
   visible: boolean;
@@ -11,6 +13,10 @@ interface DeleteConfirmationModalProps {
 }
 
 export default function DeleteConfirmationModal({ visible, onClose, onConfirm, title }: DeleteConfirmationModalProps) {
+  const { themeMode, language, expenseColor } = useFinanceStore();
+  const themeColors = Colors[themeMode];
+  const labels = LABELS[language];
+
   return (
     <Modal
       animationType="fade"
@@ -19,28 +25,28 @@ export default function DeleteConfirmationModal({ visible, onClose, onConfirm, t
       onRequestClose={onClose}
     >
       <TouchableOpacity 
-        style={styles.overlay} 
+        style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 
         activeOpacity={1} 
         onPress={onClose}
       >
-        <DefaultView style={styles.modalContent}>
-          <View style={styles.iconContainer}>
-            <Ionicons name="trash-outline" size={32} color="#FF5252" />
+        <DefaultView style={[styles.modalContent, { backgroundColor: themeColors.background, borderColor: themeColors.border }]}>
+          <View style={[styles.iconContainer, { backgroundColor: `${expenseColor}20`, borderColor: `${expenseColor}40` }]}>
+            <Ionicons name="trash-outline" size={32} color={expenseColor} />
           </View>
           
-          <Text style={styles.modalTitle}>Delete Transaction?</Text>
-          <Text style={styles.modalSubtitle}>{`Are you sure you want to delete "${title}"?`}</Text>
+          <Text style={[styles.modalTitle, { color: themeColors.text }]}>{labels.delete}?</Text>
+          <Text style={[styles.modalSubtitle, { color: themeColors.textSecondary }]}>{`Are you sure you want to delete "${title}"?`}</Text>
           
           <View style={styles.actions}>
             <TouchableOpacity 
-              style={[styles.button, styles.cancelButton]} 
+              style={[styles.button, styles.cancelButton, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
               onPress={onClose}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={[styles.cancelButtonText, { color: themeColors.textSecondary }]}>Cancel</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={[styles.button, styles.deleteButton]} 
+              style={[styles.button, styles.deleteButton, { backgroundColor: expenseColor }]} 
               onPress={() => {
                 onConfirm();
                 onClose();

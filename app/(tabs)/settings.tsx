@@ -36,6 +36,7 @@ export default function SettingsScreen() {
     setThemeMode, 
     accentColor, 
     language,
+    expenseColor
   } = useFinanceStore();
 
   const insets = useSafeAreaInsets();
@@ -97,14 +98,14 @@ export default function SettingsScreen() {
             disabled={!item.onPress}
           >
             <View style={styles.itemLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? `${Colors.dark.border}80` : themeColors.backgroundSecondary }]}>
+              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? `${expenseColor}20` : themeColors.backgroundSecondary }]}>
                 <Ionicons 
                   name={item.icon as any} 
                   size={18} 
-                  color={item.type === 'danger' ? '#FF5252' : item.type === 'color' ? accentColor : themeColors.textSecondary} 
+                  color={item.type === 'danger' ? expenseColor : item.type === 'color' ? accentColor : themeColors.textSecondary} 
                 />
               </View>
-              <Text style={[styles.itemLabel, { color: themeColors.text }, item.type === 'danger' && styles.dangerText]}>
+              <Text style={[styles.itemLabel, { color: themeColors.text }, item.type === 'danger' && { color: expenseColor }]}>
                 {item.label}
               </Text>
             </View>
@@ -112,7 +113,7 @@ export default function SettingsScreen() {
             <View style={styles.itemRight}>
               {item.type === 'color' ? (
                 <View style={styles.valueWrapper}>
-                  <View style={[styles.colorDot, { backgroundColor: item.value as string }]} />
+                  <View style={[styles.colorDot, { backgroundColor: item.value as string, borderColor: themeColors.border }]} />
                   <Ionicons name="chevron-forward" size={14} color={themeColors.border} />
                 </View>
               ) : item.type === 'danger' ? (

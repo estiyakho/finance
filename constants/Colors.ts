@@ -15,24 +15,24 @@ export default {
   },
   dark: {
     text: '#FFF',
-    textSecondary: '#888',
-    background: '#0D0D0D', // Deep charcoal, not grey
-    backgroundSecondary: '#161616',
+    textSecondary: '#A0A0A5',
+    background: '#1C1C1E', // Distinctly grey, not pitch black
+    backgroundSecondary: '#2C2C2E',
     tint: tintColorDark,
     tabIconDefault: '#666',
     tabIconSelected: tintColorDark,
-    border: '#1A1A1A',
-    card: '#121212',
+    border: '#3A3A3C',
+    card: '#2C2C2E', // Apple-style dark mode grey
   },
   amoled: {
     text: '#FFF',
-    textSecondary: '#666',
-    background: '#000', // Pure AMOLED black
-    backgroundSecondary: '#0A0A0A',
+    textSecondary: '#888',
+    background: '#000000', // Pure AMOLED black
+    backgroundSecondary: '#050505',
     tint: tintColorDark,
     tabIconDefault: '#444',
     tabIconSelected: tintColorDark,
-    border: '#111',
-    card: '#080808',
+    border: '#111111',
+    card: '#000000', // Card blends into background for maximum battery saving
   },
 };

@@ -199,7 +199,7 @@ export default function TransactionsScreen() {
       />
 
       <TouchableOpacity style={[styles.fab, { backgroundColor: accentColor }]} onPress={handleAddTransaction}>
-        <Ionicons name="add" size={32} color="#FFF" />
+        <Ionicons name="add" size={32} color={accentColor === '#FFFFFF' ? '#000' : '#FFF'} />
       </TouchableOpacity>
 
       <EditTransactionModal

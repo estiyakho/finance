@@ -32,8 +32,12 @@ export default function TransactionCard({ title, amount, type, date, currency, o
         <Text style={[styles.amount, { color: amountColor }]}>
           {`${currency} ${amount.toLocaleString()}`}
         </Text>
-        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: `${themeColors.border}50`, borderColor: themeColors.border }]} onPress={onDelete}>
-          <Ionicons name="trash-outline" size={16} color="#FF5252" />
+        <TouchableOpacity 
+          style={[styles.deleteButton, { backgroundColor: `${themeColors.border}50`, borderColor: themeColors.border }]} 
+          onPress={onDelete}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="trash-outline" size={16} color={expenseColor} />
         </TouchableOpacity>
       </View>
     </View>

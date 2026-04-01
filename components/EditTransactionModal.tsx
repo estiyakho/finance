@@ -65,7 +65,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       onRequestClose={onClose}
     >
       <TouchableOpacity 
-        style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.85)' }]} 
+        style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 
         activeOpacity={1} 
         onPress={onClose}
       >
@@ -86,16 +86,32 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
 
               <View style={styles.typeSelector}>
                 <TouchableOpacity 
-                  style={[styles.typeBtn, type === 'expense' && { backgroundColor: expenseColor }]} 
+                  style={[
+                    styles.typeBtn, 
+                    { borderColor: themeColors.border, backgroundColor: themeMode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.05)' },
+                    type === 'expense' && { backgroundColor: expenseColor, borderColor: expenseColor }
+                  ]} 
                   onPress={() => setType('expense')}
                 >
-                  <Text style={[styles.typeText, type === 'expense' && { color: '#FFF' }]}>{labels.expense}</Text>
+                  <Text style={[
+                    styles.typeText, 
+                    { color: themeColors.textSecondary },
+                    type === 'expense' && { color: '#FFF' }
+                  ]}>{labels.expense}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={[styles.typeBtn, type === 'income' && { backgroundColor: incomeColor }]} 
+                  style={[
+                    styles.typeBtn, 
+                    { borderColor: themeColors.border, backgroundColor: themeMode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.05)' },
+                    type === 'income' && { backgroundColor: incomeColor, borderColor: incomeColor }
+                  ]} 
                   onPress={() => setType('income')}
                 >
-                  <Text style={[styles.typeText, type === 'income' && { color: '#FFF' }]}>{labels.income}</Text>
+                  <Text style={[
+                    styles.typeText, 
+                    { color: themeColors.textSecondary },
+                    type === 'income' && { color: '#FFF' }
+                  ]}>{labels.income}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -142,13 +158,13 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
               <View style={styles.actions}>
                 {!isAddMode && (
                   <TouchableOpacity 
-                    style={[styles.button, styles.deleteButton, { backgroundColor: `${themeColors.border}50`, borderColor: themeColors.border }]} 
+                    style={[styles.button, styles.deleteButton, { backgroundColor: themeMode === 'light' ? '#FFF5F5' : `${themeColors.border}50`, borderColor: expenseColor }]} 
                     onPress={() => {
                       onDelete(transaction!.id);
                       onClose();
                     }}
                   >
-                    <Text style={styles.deleteButtonText}>{labels.delete}</Text>
+                    <Text style={[styles.deleteButtonText, { color: expenseColor }]}>{labels.delete}</Text>
                   </TouchableOpacity>
                 )}
 
@@ -156,7 +172,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
                   style={[styles.button, styles.saveButton, { backgroundColor: accentColor }]} 
                   onPress={handleSave}
                 >
-                  <Text style={styles.saveButtonText}>
+                  <Text style={[styles.saveButtonText, { color: accentColor === '#FFFFFF' ? '#000' : '#FFF' }]}>
                     {isAddMode ? labels.save : labels.save}
                   </Text>
                 </TouchableOpacity>
