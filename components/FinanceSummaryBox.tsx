@@ -11,18 +11,20 @@ interface FinanceSummaryBoxProps {
 }
 
 export default function FinanceSummaryBox({ balance, income, expense, currency }: FinanceSummaryBoxProps) {
-  const { themeMode, language, accentColor } = useFinanceStore();
-  const labels = LABELS[language];
+  const { themeMode, language, incomeColor, expenseColor } = useFinanceStore();
   const themeColors = Colors[themeMode];
-
-  const balanceColor = balance < 0 ? '#FF5252' : '#4CAF50';
-  const displayBalance = Math.abs(balance);
+  const labels = LABELS[language];
+  
+  const balanceColor = balance < 0 ? expenseColor : incomeColor;
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
       <View style={styles.topSection}>
         <View style={styles.balanceInfo}>
-          <Text style={[styles.amountMain, { color: balanceColor }]}>{`${currency} ${displayBalance.toLocaleString()}`}</Text>
+          <Text style={[styles.statLabel, { color: themeColors.textSecondary, marginBottom: 8 }]}>{labels.balance}</Text>
+          <Text style={[styles.amountMain, { color: balanceColor }]}>
+            {`${currency} ${balance.toLocaleString()}`}
+          </Text>
         </View>
       </View>
 
@@ -30,12 +32,12 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
 
       <View style={styles.bottomSection}>
         <View style={styles.statBox}>
-          <Text style={[styles.statAmount, { color: '#4CAF50' }]}>{`${currency} ${income.toLocaleString()}`}</Text>
+          <Text style={[styles.statAmount, { color: incomeColor }]}>{`${currency} ${income.toLocaleString()}`}</Text>
           <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.income}</Text>
         </View>
         <View style={[styles.verticalDivider, { backgroundColor: themeColors.border }]} />
         <View style={styles.statBox}>
-          <Text style={[styles.statAmount, { color: '#FF5252' }]}>{`${currency} ${expense.toLocaleString()}`}</Text>
+          <Text style={[styles.statAmount, { color: expenseColor }]}>{`${currency} ${expense.toLocaleString()}`}</Text>
           <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.expense}</Text>
         </View>
       </View>

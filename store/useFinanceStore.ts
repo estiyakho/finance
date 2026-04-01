@@ -81,6 +81,8 @@ export const LABELS: Record<Language, any> = {
     oldest: 'Oldest First',
     az: 'A to Z',
     za: 'Z to A',
+    incomeColor: 'Income Color',
+    expenseColor: 'Expense Color',
   },
   bn: {
     home: 'হোম',
@@ -114,6 +116,8 @@ export const LABELS: Record<Language, any> = {
     oldest: 'পুরানো গুলো আগে',
     az: 'এ থেকে জেড',
     za: 'জেড থেকে এ',
+    incomeColor: 'আয়ের রঙ',
+    expenseColor: 'ব্যয়ের রঙ',
   }
 };
 
@@ -122,6 +126,8 @@ interface FinanceState {
   currency: string;
   themeMode: ThemeMode;
   accentColor: string;
+  incomeColor: string;
+  expenseColor: string;
   language: Language;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt'>) => void;
   deleteTransaction: (id: string) => void;
@@ -129,6 +135,8 @@ interface FinanceState {
   setCurrency: (currency: string) => void;
   setThemeMode: (themeMode: ThemeMode) => void;
   setAccentColor: (color: string) => void;
+  setIncomeColor: (color: string) => void;
+  setExpenseColor: (color: string) => void;
   setLanguage: (lang: Language) => void;
   resetData: () => void;
   getTotalBalance: () => number;
@@ -143,6 +151,8 @@ export const useFinanceStore = create<FinanceState>()(
       currency: 'BDT',
       themeMode: 'amoled',
       accentColor: '#00AEEF',
+      incomeColor: '#4CAF50',
+      expenseColor: '#FF5252',
       language: 'en',
       addTransaction: (transaction) => set((state) => ({
         transactions: [
@@ -159,8 +169,10 @@ export const useFinanceStore = create<FinanceState>()(
       setCurrency: (currency) => set({ currency }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setAccentColor: (accentColor) => set({ accentColor }),
+      setIncomeColor: (incomeColor) => set({ incomeColor }),
+      setExpenseColor: (expenseColor) => set({ expenseColor }),
       setLanguage: (language) => set({ language }),
-      resetData: () => set({ transactions: [], currency: 'BDT', themeMode: 'amoled', accentColor: '#00AEEF', language: 'en' }),
+      resetData: () => set({ transactions: [], currency: 'BDT', themeMode: 'amoled', accentColor: '#00AEEF', incomeColor: '#4CAF50', expenseColor: '#FF5252', language: 'en' }),
       getTotalBalance: () => {
         const { transactions } = get();
         return transactions.reduce((acc: number, t: Transaction) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);

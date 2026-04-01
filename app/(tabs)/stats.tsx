@@ -7,7 +7,7 @@ import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function StatsScreen() {
-  const { transactions, currency, language, themeMode, accentColor } = useFinanceStore();
+  const { transactions, currency, language, themeMode, accentColor, incomeColor, expenseColor } = useFinanceStore();
   const insets = useSafeAreaInsets();
   const labels = LABELS[language];
   const themeColors = Colors[themeMode];
@@ -117,7 +117,7 @@ export default function StatsScreen() {
   const renderTransactionSimple = ({ item }: { item: Transaction }) => {
     const dateObj = new Date(item.createdAt || 0);
     const day = dateObj.getDate();
-    const amountColor = item.type === 'income' ? '#4CAF50' : '#FF5252';
+    const amountColor = item.type === 'income' ? incomeColor : expenseColor;
 
     return (
       <View style={[styles.simpleCard, { borderColor: themeColors.border }]}>
@@ -165,19 +165,19 @@ export default function StatsScreen() {
 
       <View style={styles.summaryRow}>
         <View style={[styles.summaryCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <View style={[styles.statIcon, { backgroundColor: '#4CAF5020' }]}>
-            <Ionicons name="trending-up" size={16} color="#4CAF50" />
+          <View style={[styles.statIcon, { backgroundColor: `${incomeColor}20` }]}>
+            <Ionicons name="trending-up" size={16} color={incomeColor} />
           </View>
           <Text style={[styles.summaryLabel, { color: themeColors.textSecondary }]}>{labels.income}</Text>
-          <Text style={[styles.summaryAmount, { color: '#4CAF50' }]}>{`${currency} ${totals.income.toLocaleString()}`}</Text>
+          <Text style={[styles.summaryAmount, { color: incomeColor }]}>{`${currency} ${totals.income.toLocaleString()}`}</Text>
         </View>
 
         <View style={[styles.summaryCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
-          <View style={[styles.statIcon, { backgroundColor: '#FF525220' }]}>
-            <Ionicons name="trending-down" size={16} color="#FF5252" />
+          <View style={[styles.statIcon, { backgroundColor: `${expenseColor}20` }]}>
+            <Ionicons name="trending-down" size={16} color={expenseColor} />
           </View>
           <Text style={[styles.summaryLabel, { color: themeColors.textSecondary }]}>{labels.expense}</Text>
-          <Text style={[styles.summaryAmount, { color: '#FF5252' }]}>{`${currency} ${totals.expense.toLocaleString()}`}</Text>
+          <Text style={[styles.summaryAmount, { color: expenseColor }]}>{`${currency} ${totals.expense.toLocaleString()}`}</Text>
         </View>
       </View>
 

@@ -12,10 +12,10 @@ interface TransactionCardProps extends Transaction {
 }
 
 export default function TransactionCard({ title, amount, type, date, currency, onDelete }: TransactionCardProps) {
-  const { themeMode } = useFinanceStore();
+  const { themeMode, incomeColor, expenseColor } = useFinanceStore();
   const themeColors = Colors[themeMode];
   
-  const amountColor = type === 'income' ? '#4CAF50' : '#FF5252';
+  const amountColor = type === 'income' ? incomeColor : expenseColor;
   const prefix = type === 'income' ? '+' : '-';
 
   return (

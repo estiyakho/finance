@@ -7,7 +7,9 @@ import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
 import Colors from '@/constants/Colors';
 import { 
   CurrencyPickerModal, 
-  ColorPickerModal, 
+  AccentColorPickerModal, 
+  IncomeColorPickerModal,
+  ExpenseColorPickerModal,
   LanguagePickerModal, 
   ThemePickerModal,
   ResetConfirmationModal 
@@ -45,6 +47,8 @@ export default function SettingsScreen() {
   const [langVisible, setLangVisible] = useState(false);
   const [themeVisible, setThemeVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
+  const [incomeColorVisible, setIncomeColorVisible] = useState(false);
+  const [expenseColorVisible, setExpenseColorVisible] = useState(false);
 
   const SETTINGS_SECTIONS: SettingsSection[] = [
     {
@@ -52,6 +56,8 @@ export default function SettingsScreen() {
       data: [
         { id: 'theme', label: labels.theme, value: labels[themeMode], icon: 'sunny-outline', type: 'choice', onPress: () => setThemeVisible(true) },
         { id: 'accent', label: labels.accent, type: 'color', value: accentColor, icon: 'color-palette-outline', onPress: () => setColorVisible(true) },
+        { id: 'incomeColor', label: labels.incomeColor, type: 'color', value: useFinanceStore().incomeColor, icon: 'trending-up-outline', onPress: () => setIncomeColorVisible(true) },
+        { id: 'expenseColor', label: labels.expenseColor, type: 'color', value: useFinanceStore().expenseColor, icon: 'trending-down-outline', onPress: () => setExpenseColorVisible(true) },
       ],
     },
     {
@@ -128,7 +134,9 @@ export default function SettingsScreen() {
       />
 
       <CurrencyPickerModal visible={currencyVisible} onClose={() => setCurrencyVisible(false)} />
-      <ColorPickerModal visible={colorVisible} onClose={() => setColorVisible(false)} />
+      <AccentColorPickerModal visible={colorVisible} onClose={() => setColorVisible(false)} />
+      <IncomeColorPickerModal visible={incomeColorVisible} onClose={() => setIncomeColorVisible(false)} />
+      <ExpenseColorPickerModal visible={expenseColorVisible} onClose={() => setExpenseColorVisible(false)} />
       <LanguagePickerModal visible={langVisible} onClose={() => setLangVisible(false)} />
       <ThemePickerModal visible={themeVisible} onClose={() => setThemeVisible(false)} />
       <ResetConfirmationModal visible={resetVisible} onClose={() => setResetVisible(false)} />

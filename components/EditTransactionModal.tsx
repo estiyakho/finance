@@ -15,7 +15,7 @@ interface EditTransactionModalProps {
 }
 
 export default function EditTransactionModal({ visible, transaction, onClose, onSave, onDelete }: EditTransactionModalProps) {
-  const { themeMode, language, accentColor } = useFinanceStore();
+  const { themeMode, language, accentColor, incomeColor, expenseColor } = useFinanceStore();
   const themeColors = Colors[themeMode];
   const labels = LABELS[language];
 
@@ -86,13 +86,13 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
 
               <View style={styles.typeSelector}>
                 <TouchableOpacity 
-                  style={[styles.typeBtn, type === 'expense' && { backgroundColor: '#FF5252' }]} 
+                  style={[styles.typeBtn, type === 'expense' && { backgroundColor: expenseColor }]} 
                   onPress={() => setType('expense')}
                 >
                   <Text style={[styles.typeText, type === 'expense' && { color: '#FFF' }]}>{labels.expense}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={[styles.typeBtn, type === 'income' && { backgroundColor: '#4CAF50' }]} 
+                  style={[styles.typeBtn, type === 'income' && { backgroundColor: incomeColor }]} 
                   onPress={() => setType('income')}
                 >
                   <Text style={[styles.typeText, type === 'income' && { color: '#FFF' }]}>{labels.income}</Text>

@@ -73,13 +73,13 @@ export function LanguagePickerModal({ visible, onClose }: PickerProps) {
   );
 }
 
-export function ColorPickerModal({ visible, onClose }: PickerProps) {
-  const { accentColor, setAccentColor, language } = useFinanceStore();
-  const colors = ['#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', '#FFFFFF', '#FF8C00', '#00FF7F'];
-  const labels = LABELS[language];
+export function GenericColorPickerModal({ 
+  visible, onClose, title, selectedColor, onSelectColor 
+}: PickerProps & { title: string, selectedColor: string, onSelectColor: (c: string) => void }) {
+  const colors = ['#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', '#FFFFFF', '#FF8C00', '#00FF7F', '#9C27B0', '#00BCD4'];
 
   return (
-    <CoreModal visible={visible} onClose={onClose} title={labels.accent}>
+    <CoreModal visible={visible} onClose={onClose} title={title}>
       <View style={styles.grid}>
         {colors.map((color) => (
           <TouchableOpacity
@@ -87,19 +87,37 @@ export function ColorPickerModal({ visible, onClose }: PickerProps) {
             style={[
               styles.colorCircle,
               { backgroundColor: color },
-              accentColor === color && { borderColor: '#FFF', borderWidth: 2 }
+              selectedColor === color && { borderColor: '#FFF', borderWidth: 2 }
             ]}
             onPress={() => {
-              setAccentColor(color);
+              onSelectColor(color);
               onClose();
             }}
           >
-            {accentColor === color && <Ionicons name="checkmark" size={16} color={color === '#FFFFFF' ? '#000' : '#FFF'} />}
+            {selectedColor === color && <Ionicons name="checkmark" size={16} color={color === '#FFFFFF' ? '#000' : '#FFF'} />}
           </TouchableOpacity>
         ))}
       </View>
     </CoreModal>
   );
+}
+
+export function AccentColorPickerModal(props: PickerProps) {
+  const { accentColor, setAccentColor, language } = useFinanceStore();
+  const labels = LABELS[language];
+  return <GenericColorPickerModal {...props} title={labels.accent} selectedColor={accentColor} onSelectColor={setAccentColor} />;
+}
+
+export function IncomeColorPickerModal(props: PickerProps) {
+  const { incomeColor, setIncomeColor, language } = useFinanceStore();
+  const labels = LABELS[language];
+  return <GenericColorPickerModal {...props} title={labels.incomeColor} selectedColor={incomeColor} onSelectColor={setIncomeColor} />;
+}
+
+export function ExpenseColorPickerModal(props: PickerProps) {
+  const { expenseColor, setExpenseColor, language } = useFinanceStore();
+  const labels = LABELS[language];
+  return <GenericColorPickerModal {...props} title={labels.expenseColor} selectedColor={expenseColor} onSelectColor={setExpenseColor} />;
 }
 
 export function ThemePickerModal({ visible, onClose }: PickerProps) {
