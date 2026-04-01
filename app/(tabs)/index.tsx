@@ -7,8 +7,11 @@ import TransactionCard from '@/components/TransactionCard';
 import FinanceSummaryBox from '@/components/FinanceSummaryBox';
 import EditTransactionModal from '@/components/EditTransactionModal';
 import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
+import { SortPickerModal } from '@/components/PickerModals';
 import { useFinanceStore, Transaction, LABELS } from '@/store/useFinanceStore';
 import Colors from '@/constants/Colors';
+
+export type SortMode = 'newest' | 'oldest' | 'az' | 'za';
 
 export default function TransactionsScreen() {
   const { 
@@ -35,8 +38,9 @@ export default function TransactionsScreen() {
   const [deleteTransactionId, setDeleteTransactionId] = useState<string | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
+  const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [sortBy, setSortBy] = useState<SortMode>('newest');
+  const [sortModalVisible, setSortModalVisible] = useState(false);
 
   const filteredTransactions = useMemo(() => {
     let result = transactions.filter(t => 
@@ -48,13 +52,17 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
     }
 
     result = [...result].sort((a, b) => {
-      if (sortBy === 'amount') {
-        return b.amount - a.amount;
-      } else {
-        // Default to date/time sort (newest first)
-        // Since we store date as strings, we might need to be careful, 
-        // but the addTransaction adds them in order.
-        return 0; // The store already keeps them in descending order of addition
+      switch (sortBy) {
+        case 'newest':
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        case 'oldest':
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        case 'az':
+          return a.title.localeCompare(b.title);
+        case 'za':
+          return b.title.localeCompare(a.title);
+        default:
+          return 0;
       }
     });
 
@@ -63,12 +71,13 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
 
   const handleAddTransaction = () => {
     setEditingTransaction({
-      id: '', // Blank ID signals 'Add Mode' to the modal
+      id: '', 
       title: '',
       amount: 0,
       type: 'expense',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      createdAt: Date.now(),
     });
     setEditModalVisible(true);
   };
@@ -82,7 +91,7 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
     if (id) {
       updateTransaction(id, updates);
     } else {
-      addTransaction(updates as Omit<Transaction, 'id'>);
+      addTransaction(updates as Omit<Transaction, 'id' | 'createdAt'>);
     }
     setEditModalVisible(false);
   };
@@ -102,10 +111,6 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
   const deletingTransactionTitle = useMemo(() => {
     return transactions.find(t => t.id === deleteTransactionId)?.title || '';
   }, [transactions, deleteTransactionId]);
-
-  const toggleSort = () => {
-    setSortBy(prev => prev === 'date' ? 'amount' : 'date');
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background, paddingTop: insets.top }]}>
@@ -159,14 +164,18 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
                     key={type}
                     style={[
                       styles.chip,
-                      filterType === type && { backgroundColor: accentColor }
+                      filterType === type && { 
+                        borderColor: accentColor,
+                        borderWidth: 1.5,
+                        backgroundColor: 'transparent'
+                      }
                     ]}
                     onPress={() => setFilterType(type)}
                   >
                     <Text 
                       style={[
                         styles.chipText, 
-                        { color: filterType === type ? '#FFF' : themeColors.textSecondary }
+                        { color: filterType === type ? accentColor : themeColors.textSecondary }
                       ]}
                     >
                       {labels[type]}
@@ -177,7 +186,7 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
 
               <TouchableOpacity 
                 style={[styles.sortButton, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
-                onPress={toggleSort}
+                onPress={() => setSortModalVisible(true)}
               >
                 <Ionicons name="swap-vertical" size={16} color={themeColors.textSecondary} />
                 <Text style={[styles.sortButtonText, { color: themeColors.textSecondary }]}>{labels.sort}</Text>
@@ -207,6 +216,13 @@ const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all'
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={handleDelete}
       />
+
+      <SortPickerModal
+        visible={sortModalVisible}
+        onClose={() => setSortModalVisible(false)}
+        value={sortBy}
+        onSelect={setSortBy}
+      />
     </View>
   );
 }
@@ -216,7 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingBottom: 12,
+    paddingBottom: 4,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -224,7 +240,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 18,
     marginTop: 8,
-    marginBottom: 20,
+    marginBottom: 10,
     height: 54,
     borderWidth: 1,
   },
@@ -238,33 +254,38 @@ const styles = StyleSheet.create({
   },
   filterSortRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
+    gap: 8,
     backgroundColor: 'transparent',
   },
   chipsContainer: {
+    flex: 1,
     flexDirection: 'row',
-    borderRadius: 16,
-    padding: 4,
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    padding: 3,
     borderWidth: 1,
+    height: 42,
   },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
   },
   chipText: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'MartianMono-Bold',
   },
   sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
+    height: 42,
   },
   sortButtonText: {
     fontSize: 11,

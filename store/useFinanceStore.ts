@@ -42,6 +42,7 @@ export interface Transaction {
   type: 'income' | 'expense';
   date: string;
   time: string;
+  createdAt: number;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'amoled';
@@ -76,6 +77,10 @@ export const LABELS: Record<Language, any> = {
     dark: 'Dark',
     all: 'All',
     sort: 'Sort',
+    newest: 'Newest First',
+    oldest: 'Oldest First',
+    az: 'A to Z',
+    za: 'Z to A',
   },
   bn: {
     home: 'হোম',
@@ -105,6 +110,10 @@ export const LABELS: Record<Language, any> = {
     dark: 'ডার্ক',
     all: 'সব',
     sort: 'সর্ট',
+    newest: 'নতুনগুলো আগে',
+    oldest: 'পুরানো গুলো আগে',
+    az: 'এ থেকে জেড',
+    za: 'জেড থেকে এ',
   }
 };
 
@@ -114,7 +123,7 @@ interface FinanceState {
   themeMode: ThemeMode;
   accentColor: string;
   language: Language;
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt'>) => void;
   deleteTransaction: (id: string) => void;
   updateTransaction: (id: string, updates: Partial<Omit<Transaction, 'id'>>) => void;
   setCurrency: (currency: string) => void;
@@ -137,7 +146,7 @@ export const useFinanceStore = create<FinanceState>()(
       language: 'en',
       addTransaction: (transaction) => set((state) => ({
         transactions: [
-          { ...transaction, id: Math.random().toString(36).substring(7) },
+          { ...transaction, id: Math.random().toString(36).substring(7), createdAt: Date.now() },
           ...state.transactions
         ]
       })),

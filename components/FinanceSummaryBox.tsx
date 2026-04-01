@@ -1,8 +1,7 @@
+import Colors from '@/constants/Colors';
+import { LABELS, useFinanceStore } from '@/store/useFinanceStore';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
-import Colors from '@/constants/Colors';
 
 interface FinanceSummaryBoxProps {
   balance: number;
@@ -16,19 +15,19 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
   const labels = LABELS[language];
   const themeColors = Colors[themeMode];
 
+  const balanceColor = balance < 0 ? '#FF5252' : '#4CAF50';
+  const displayBalance = Math.abs(balance);
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
       <View style={styles.topSection}>
-        <View style={[styles.iconContainer, { backgroundColor: themeColors.backgroundSecondary }]}>
-          <Ionicons name="wallet-outline" size={24} color={accentColor} />
-        </View>
         <View style={styles.balanceInfo}>
-          <Text style={[styles.amountMain, { color: themeColors.text }]}>{`${currency} ${balance.toLocaleString()}`}</Text>
+          <Text style={[styles.amountMain, { color: balanceColor }]}>{`${currency} ${displayBalance.toLocaleString()}`}</Text>
         </View>
       </View>
-      
+
       <View style={[styles.divider, { backgroundColor: themeColors.border }]} />
-      
+
       <View style={styles.bottomSection}>
         <View style={styles.statBox}>
           <Text style={[styles.statAmount, { color: '#4CAF50' }]}>{`${currency} ${income.toLocaleString()}`}</Text>
@@ -46,37 +45,27 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 10,
     borderWidth: 1,
   },
   topSection: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 24,
+    marginTop: 8,
+    marginBottom: 12,
+    backgroundColor: 'transparent',
   },
   balanceInfo: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 4,
-    fontFamily: 'MartianMono',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   amountMain: {
-    fontSize: 22,
+    fontSize: 28,
     fontFamily: 'MartianMono-Bold',
+    textAlign: 'center',
   },
   divider: {
     height: 1,

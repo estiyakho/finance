@@ -173,6 +173,54 @@ export function ResetConfirmationModal({ visible, onClose }: PickerProps) {
   );
 }
 
+export function SortPickerModal({ 
+  visible, 
+  onClose, 
+  value, 
+  onSelect 
+}: PickerProps & { value: string, onSelect: (val: any) => void }) {
+  const { language, accentColor } = useFinanceStore();
+  const labels = LABELS[language];
+
+  const options = [
+    { code: 'newest', label: labels.newest, icon: 'time-outline' },
+    { code: 'oldest', label: labels.oldest, icon: 'hourglass-outline' },
+    { code: 'az', label: labels.az, icon: 'text-outline' },
+    { code: 'za', label: labels.za, icon: 'text-outline' },
+  ];
+
+  return (
+    <CoreModal visible={visible} onClose={onClose} title={labels.sort}>
+      <DefaultView style={styles.list}>
+        {options.map((opt) => (
+          <TouchableOpacity
+            key={opt.code}
+            style={[
+              styles.listItem,
+              value === opt.code && { backgroundColor: `${accentColor}10` }
+            ]}
+            onPress={() => {
+              onSelect(opt.code);
+              onClose();
+            }}
+          >
+            <DefaultView style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons 
+                name={opt.icon as any} 
+                size={20} 
+                color={value === opt.code ? accentColor : '#888'} 
+                style={{ marginRight: 12 }} 
+              />
+              <Text style={[styles.listText, value === opt.code && { color: accentColor }]}>{opt.label}</Text>
+            </DefaultView>
+            {value === opt.code && <Ionicons name="checkmark" size={20} color={accentColor} />}
+          </TouchableOpacity>
+        ))}
+      </DefaultView>
+    </CoreModal>
+  );
+}
+
 const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
