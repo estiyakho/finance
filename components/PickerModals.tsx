@@ -78,16 +78,18 @@ export function GenericColorPickerModal({
   visible, onClose, title, selectedColor, onSelectColor 
 }: PickerProps & { title: string, selectedColor: string, onSelectColor: (c: string) => void }) {
   const COLOR_PALETTES = [
-    { name: 'Red', hex: '#F44336', shades: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C', '#D50000'] },
-    { name: 'Pink', hex: '#E91E63', shades: ['#FCE4EC', '#F8BBD0', '#F48FB1', '#F06292', '#E91E63', '#D81B60', '#C2185B', '#AD1457', '#880E4F', '#C51162'] },
-    { name: 'Purple', hex: '#9C27B0', shades: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#9C27B0', '#8E24AA', '#7B1FA2', '#6A1B9A', '#4A148C', '#AA00FF'] },
-    { name: 'Blue', hex: '#2196F3', shades: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#2196F3', '#1E88E5', '#1976D2', '#1565C0', '#0D47A1', '#2962FF'] },
-    { name: 'Cyan', hex: '#00BCD4', shades: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#006064', '#00B8D4'] },
-    { name: 'Teal', hex: '#009688', shades: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#009688', '#00897B', '#00796B', '#00695C', '#004D40', '#00BFA5'] },
-    { name: 'Green', hex: '#4CAF50', shades: ['#E8F5E9', '#C8E6C9', '#A5D6A7', '#81C784', '#4CAF50', '#43A047', '#388E3C', '#2E7D32', '#1B5E20', '#00E676'] },
-    { name: 'Yellow', hex: '#FFEB3B', shades: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEB3B', '#FDD835', '#FBC02D', '#F9A825', '#F57F17', '#FFEA00'] },
-    { name: 'Orange', hex: '#FF9800', shades: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FF9800', '#FB8C00', '#F57C00', '#EF6C00', '#E65100', '#FF6D00'] },
-    { name: 'Grey', hex: '#9E9E9E', shades: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'] }
+    { name: 'Red', hex: '#F44336', shades: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C', '#D50000', '#FF1744'] },
+    { name: 'Pink', hex: '#E91E63', shades: ['#FCE4EC', '#F8BBD0', '#F48FB1', '#F06292', '#EC407A', '#E91E63', '#D81B60', '#C2185B', '#AD1457', '#880E4F', '#C51162', '#F50057'] },
+    { name: 'Purple', hex: '#9C27B0', shades: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#8E24AA', '#7B1FA2', '#6A1B9A', '#4A148C', '#AA00FF', '#D500F9'] },
+    { name: 'Indigo', hex: '#3F51B5', shades: ['#E8EAF6', '#C5CAE9', '#9FA8DA', '#7986CB', '#5C6BC0', '#3F51B5', '#3949AB', '#303F9F', '#283593', '#1A237E', '#3D5AFE', '#536DFE'] },
+    { name: 'Blue', hex: '#2196F3', shades: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#2196F3', '#1E88E5', '#1976D2', '#1565C0', '#0D47A1', '#2979FF', '#2962FF'] },
+    { name: 'Cyan', hex: '#00BCD4', shades: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#26C6DA', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#006064', '#00E5FF', '#00B8D4'] },
+    { name: 'Teal', hex: '#009688', shades: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#009688', '#00897B', '#00796B', '#00695C', '#004D40', '#1DE9B6', '#00BFA5'] },
+    { name: 'Green', hex: '#4CAF50', shades: ['#E8F5E9', '#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A', '#4CAF50', '#43A047', '#388E3C', '#2E7D32', '#1B5E20', '#00E676', '#00C853'] },
+    { name: 'Yellow', hex: '#FFEB3B', shades: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#FFEB3B', '#FDD835', '#FBC02D', '#F9A825', '#F57F17', '#FFFF00', '#FFEA00'] },
+    { name: 'Orange', hex: '#FF9800', shades: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#FB8C00', '#F57C00', '#EF6C00', '#E65100', '#FF9100', '#FF6D00'] },
+    { name: 'Brown', hex: '#795548', shades: ['#EFEBE9', '#D7CCC8', '#BCAAA4', '#A1887F', '#8D6E63', '#795548', '#6D4C41', '#5D4037', '#4E342E', '#3E2723', '#251614', '#1F1111'] },
+    { name: 'Grey', hex: '#9E9E9E', shades: ['#FFFFFF', '#FAFAFA', '#F5F5F5', '#EEEEEE', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'] }
   ];
 
   const [activePaletteIndex, setActivePaletteIndex] = useState(0);
@@ -354,9 +356,10 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   colorCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    margin: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
