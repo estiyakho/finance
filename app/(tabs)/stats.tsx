@@ -126,7 +126,7 @@ export default function StatsScreen() {
           <Text style={[styles.simpleTitle, { color: themeColors.text }]} numberOfLines={1}>{item.title}</Text>
         </View>
         <Text style={[styles.simpleAmount, { color: amountColor }]}>
-          {`${currency} ${item.amount.toLocaleString()}`}
+          {item.amount.toLocaleString()}
         </Text>
       </View>
     );
@@ -169,7 +169,7 @@ export default function StatsScreen() {
             <Ionicons name="trending-up" size={16} color={incomeColor} />
           </View>
           <Text style={[styles.summaryLabel, { color: themeColors.textSecondary }]}>{labels.income}</Text>
-          <Text style={[styles.summaryAmount, { color: incomeColor }]}>{`${currency} ${totals.income.toLocaleString()}`}</Text>
+          <Text style={[styles.summaryAmount, { color: incomeColor }]}>{totals.income.toLocaleString()}</Text>
         </View>
 
         <View style={[styles.summaryCard, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
@@ -177,11 +177,12 @@ export default function StatsScreen() {
             <Ionicons name="trending-down" size={16} color={expenseColor} />
           </View>
           <Text style={[styles.summaryLabel, { color: themeColors.textSecondary }]}>{labels.expense}</Text>
-          <Text style={[styles.summaryAmount, { color: expenseColor }]}>{`${currency} ${totals.expense.toLocaleString()}`}</Text>
+          <Text style={[styles.summaryAmount, { color: expenseColor }]}>{totals.expense.toLocaleString()}</Text>
         </View>
       </View>
 
       <FlatList
+        style={{ flex: 1 }}
         data={monthlyTransactions}
         keyExtractor={item => item.id}
         renderItem={renderTransactionSimple}

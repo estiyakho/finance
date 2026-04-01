@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, View as DefaultView } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { Ionicons } from '@expo/vector-icons';
-import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
-import CoreModal from './CoreModal';
 import Colors from '@/constants/Colors';
+import { LABELS, ThemeMode, useFinanceStore } from '@/store/useFinanceStore';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View as DefaultView, StyleSheet, TouchableOpacity } from 'react-native';
+import CoreModal from './CoreModal';
 
 interface PickerProps {
   visible: boolean;
@@ -74,8 +74,8 @@ export function LanguagePickerModal({ visible, onClose }: PickerProps) {
   );
 }
 
-export function GenericColorPickerModal({ 
-  visible, onClose, title, selectedColor, onSelectColor 
+export function GenericColorPickerModal({
+  visible, onClose, title, selectedColor, onSelectColor
 }: PickerProps & { title: string, selectedColor: string, onSelectColor: (c: string) => void }) {
   const COLOR_PALETTES = [
     { name: 'Red', hex: '#F44336', shades: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C', '#D50000', '#FF1744'] },
@@ -194,11 +194,11 @@ export function ThemePickerModal({ visible, onClose }: PickerProps) {
             }}
           >
             <DefaultView style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent' }}>
-              <Ionicons 
-                name={opt.icon as any} 
-                size={20} 
-                color={currentThemeMode === opt.code ? accentColor : Colors[currentThemeMode].textSecondary} 
-                style={{ marginRight: 12 }} 
+              <Ionicons
+                name={opt.icon as any}
+                size={20}
+                color={currentThemeMode === opt.code ? accentColor : Colors[currentThemeMode].textSecondary}
+                style={{ marginRight: 12 }}
               />
               <Text style={[styles.listText, { color: Colors[currentThemeMode].text }, currentThemeMode === opt.code && { color: accentColor }]}>{opt.label}</Text>
             </DefaultView>
@@ -223,14 +223,14 @@ export function ResetConfirmationModal({ visible, onClose }: PickerProps) {
         </DefaultView>
         <Text style={[styles.confirmText, { color: themeColors.text }]}>{labels.confirmDelete}</Text>
         <DefaultView style={styles.actions}>
-          <TouchableOpacity 
-            style={[styles.cancelBtn, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
+          <TouchableOpacity
+            style={[styles.cancelBtn, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
             onPress={onClose}
           >
             <Text style={[styles.cancelBtnText, { color: themeColors.textSecondary }]}>{labels.cancel}</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.confirmBtn, { backgroundColor: expenseColor }]} 
+          <TouchableOpacity
+            style={[styles.confirmBtn, { backgroundColor: expenseColor }]}
             onPress={() => {
               resetData();
               onClose();
@@ -244,11 +244,11 @@ export function ResetConfirmationModal({ visible, onClose }: PickerProps) {
   );
 }
 
-export function SortPickerModal({ 
-  visible, 
-  onClose, 
-  value, 
-  onSelect 
+export function SortPickerModal({
+  visible,
+  onClose,
+  value,
+  onSelect
 }: PickerProps & { value: string, onSelect: (val: any) => void }) {
   const { language, accentColor } = useFinanceStore();
   const labels = LABELS[language];
@@ -276,11 +276,11 @@ export function SortPickerModal({
             }}
           >
             <DefaultView style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons 
-                name={opt.icon as any} 
-                size={20} 
-                color={value === opt.code ? accentColor : '#888'} 
-                style={{ marginRight: 12 }} 
+              <Ionicons
+                name={opt.icon as any}
+                size={20}
+                color={value === opt.code ? accentColor : '#888'}
+                style={{ marginRight: 12 }}
               />
               <Text style={[styles.listText, value === opt.code && { color: accentColor }]}>{opt.label}</Text>
             </DefaultView>
