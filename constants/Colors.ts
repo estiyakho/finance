@@ -22,7 +22,7 @@ export default {
     tabIconDefault: '#666',
     tabIconSelected: tintColorDark,
     border: '#3A3A3C',
-    card: '#2C2C2E', // Apple-style dark mode grey
+    card: '#29292d7e', // Apple-style dark mode grey
   },
   amoled: {
     text: '#FFF',

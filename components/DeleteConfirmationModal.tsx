@@ -23,6 +23,7 @@ export default function DeleteConfirmationModal({ visible, onClose, onConfirm, t
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      statusBarTranslucent={true}
     >
       <TouchableOpacity 
         style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 

@@ -24,6 +24,7 @@ export default function CoreModal({ visible, onClose, title, children }: CoreMod
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      statusBarTranslucent={true}
     >
       <TouchableOpacity 
         style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 

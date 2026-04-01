@@ -43,16 +43,14 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
   };
 
   const handleSave = () => {
-    if (title && amount) {
-      onSave(transaction?.id || null, {
-        title,
-        amount: parseFloat(amount),
-        date,
-        type,
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      });
-      onClose();
-    }
+    onSave(transaction?.id || null, {
+      title: title.trim() || 'Untitled',
+      amount: amount ? parseFloat(amount) : 0,
+      date,
+      type,
+      time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    });
+    onClose();
   };
 
   if (!transaction && !visible) return null;
@@ -63,6 +61,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
+      statusBarTranslucent={true}
     >
       <TouchableOpacity 
         style={[styles.overlay, { backgroundColor: themeMode === 'light' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.85)' }]} 
@@ -71,7 +70,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.modalContainer}
           >
             <View style={[styles.modalContent, { backgroundColor: themeColors.background, borderColor: themeColors.border }]}>
@@ -89,20 +88,6 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
                   style={[
                     styles.typeBtn, 
                     { borderColor: themeColors.border, backgroundColor: themeMode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.05)' },
-                    type === 'expense' && { backgroundColor: expenseColor, borderColor: expenseColor }
-                  ]} 
-                  onPress={() => setType('expense')}
-                >
-                  <Text style={[
-                    styles.typeText, 
-                    { color: themeColors.textSecondary },
-                    type === 'expense' && { color: '#FFF' }
-                  ]}>{labels.expense}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[
-                    styles.typeBtn, 
-                    { borderColor: themeColors.border, backgroundColor: themeMode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.05)' },
                     type === 'income' && { backgroundColor: incomeColor, borderColor: incomeColor }
                   ]} 
                   onPress={() => setType('income')}
@@ -113,10 +98,24 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
                     type === 'income' && { color: '#FFF' }
                   ]}>{labels.income}</Text>
                 </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[
+                    styles.typeBtn, 
+                    { borderColor: themeColors.border, backgroundColor: themeMode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.05)' },
+                    type === 'expense' && { backgroundColor: expenseColor, borderColor: expenseColor }
+                  ]} 
+                  onPress={() => setType('expense')}
+                >
+                  <Text style={[
+                    styles.typeText, 
+                    { color: themeColors.textSecondary },
+                    type === 'expense' && { color: '#FFF' }
+                  ]}>{labels.expense}</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: accentColor }]}>{labels.home}</Text>
+                <Text style={[styles.label, { color: accentColor }]}>{labels.txDetails}</Text>
                 <TextInput
                   style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
                   value={title}
@@ -126,7 +125,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: accentColor }]}>{labels.currency}</Text>
+                <Text style={[styles.label, { color: accentColor }]}>{labels.txAmount}</Text>
                 <TextInput
                   style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
                   value={amount}
@@ -138,7 +137,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: accentColor }]}>{labels.stats}</Text>
+                <Text style={[styles.label, { color: accentColor }]}>{labels.txDate}</Text>
                 <TouchableOpacity 
                   style={[styles.datePickerButton, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
                   onPress={() => setDatePickerVisibility(true)}
@@ -149,6 +148,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
                 <DateTimePickerModal
                   isVisible={isDatePickerVisible}
                   mode="date"
+                  display={Platform.OS === 'ios' ? 'inline' : 'default'}
                   onConfirm={handleConfirmDate}
                   onCancel={() => setDatePickerVisibility(false)}
                   themeVariant={themeMode === 'light' ? 'light' : 'dark'}
