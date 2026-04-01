@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity, TextInput, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, TextInput, Platform, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import TransactionCard from '@/components/TransactionCard';
@@ -40,14 +41,15 @@ export default function TransactionsScreen() {
   }, [transactions, searchQuery]);
 
   const handleAddTransaction = () => {
-    const newTx: Omit<Transaction, 'id'> = {
-      title: labels.newEntry,
+    setEditingTransaction({
+      id: '', // Blank ID signals 'Add Mode' to the modal
+      title: '',
       amount: 0,
       type: 'expense',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-    };
-    addTransaction(newTx);
+    });
+    setEditModalVisible(true);
   };
 
   const handleEditPress = (transaction: Transaction) => {
@@ -55,8 +57,13 @@ export default function TransactionsScreen() {
     setEditModalVisible(true);
   };
 
-  const handleSaveEdit = (id: string, updates: Partial<Transaction>) => {
-    updateTransaction(id, updates);
+  const handleSaveEdit = (id: string | null, updates: Partial<Transaction>) => {
+    if (id) {
+      updateTransaction(id, updates);
+    } else {
+      addTransaction(updates as Omit<Transaction, 'id'>);
+    }
+    setEditModalVisible(false);
   };
 
   const confirmDelete = (id: string) => {

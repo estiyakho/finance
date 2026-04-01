@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, SectionList, TouchableOpacity, Switch, View as DefaultView, Platform } from 'react-native';
+import { StyleSheet, SectionList, TouchableOpacity, Switch, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
@@ -8,6 +9,7 @@ import {
   CurrencyPickerModal, 
   ColorPickerModal, 
   LanguagePickerModal, 
+  ThemePickerModal,
   ResetConfirmationModal 
 } from '@/components/PickerModals';
 
@@ -39,22 +41,20 @@ export default function SettingsScreen() {
   const [currencyVisible, setCurrencyVisible] = useState(false);
   const [colorVisible, setColorVisible] = useState(false);
   const [langVisible, setLangVisible] = useState(false);
+  const [themeVisible, setThemeVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
 
   const themeColors = Colors[themeMode];
 
   const handleThemeChange = () => {
-    const modes: ThemeMode[] = ['light', 'dark', 'amoled'];
-    const currentIndex = modes.indexOf(themeMode);
-    const nextIndex = (currentIndex + 1) % modes.length;
-    setThemeMode(modes[nextIndex]);
+    setThemeVisible(true);
   };
 
   const SETTINGS_SECTIONS: SettingsSection[] = [
     {
       title: labels.appearance,
       data: [
-        { id: 'theme', label: labels.theme, value: themeMode.toUpperCase(), icon: 'sunny-outline', type: 'choice', onPress: handleThemeChange },
+        { id: 'theme', label: labels.theme, value: labels[themeMode], icon: 'sunny-outline', type: 'choice', onPress: () => setThemeVisible(true) },
         { id: 'accent', label: labels.accent, type: 'color', value: accentColor, icon: 'color-palette-outline', onPress: () => setColorVisible(true) },
       ],
     },
@@ -69,7 +69,6 @@ export default function SettingsScreen() {
       title: labels.dataPrivacy,
       data: [
         { id: 'reset', label: labels.resetData, type: 'danger', icon: 'refresh-outline', onPress: () => setResetVisible(true) },
-        { id: 'reset', label: labels.resetData, type: 'danger', icon: 'trash-outline', onPress: () => setResetVisible(true) },
       ],
     },
   ];
@@ -130,6 +129,7 @@ export default function SettingsScreen() {
       <CurrencyPickerModal visible={currencyVisible} onClose={() => setCurrencyVisible(false)} />
       <ColorPickerModal visible={colorVisible} onClose={() => setColorVisible(false)} />
       <LanguagePickerModal visible={langVisible} onClose={() => setLangVisible(false)} />
+      <ThemePickerModal visible={themeVisible} onClose={() => setThemeVisible(false)} />
       <ResetConfirmationModal visible={resetVisible} onClose={() => setResetVisible(false)} />
     </View>
   );

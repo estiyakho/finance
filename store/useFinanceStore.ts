@@ -1,6 +1,39 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+// Custom storage wrapper to handle 'Native module is null' error gracefully
+const customStorage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    try {
+      return await AsyncStorage.getItem(name);
+    } catch (e) {
+      if (Platform.OS === 'web') {
+        return localStorage.getItem(name);
+      }
+      return null;
+    }
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch (e) {
+      if (Platform.OS === 'web') {
+        localStorage.setItem(name, value);
+      }
+    }
+  },
+  removeItem: async (name: string): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch (e) {
+      if (Platform.OS === 'web') {
+        localStorage.removeItem(name);
+      }
+    }
+  },
+};
 
 export interface Transaction {
   id: string;
@@ -39,6 +72,8 @@ export const LABELS: Record<Language, any> = {
     dataPrivacy: 'Data & Privacy',
     amoled: 'AMOLED Mode',
     accent: 'Accent Color',
+    light: 'Light',
+    dark: 'Dark',
   },
   bn: {
     home: 'হোম',
@@ -62,8 +97,10 @@ export const LABELS: Record<Language, any> = {
     appearance: 'চেহারা',
     preferences: 'পছন্দসমূহ',
     dataPrivacy: 'ডেটা এবং গোপনীয়তা',
-    amoled: 'AMOLED মোড',
+    amoled: 'অ্যামোলেড মোড',
     accent: 'অ্যাকসেন্ট কালার',
+    light: 'লাইট',
+    dark: 'ডার্ক',
   }
 };
 
@@ -126,7 +163,7 @@ export const useFinanceStore = create<FinanceState>()(
     }),
     {
       name: 'finance-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => customStorage),
     }
   )
 );

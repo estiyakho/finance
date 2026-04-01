@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, View as DefaultView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
+import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
 import CoreModal from './CoreModal';
 
 interface PickerProps {
@@ -98,6 +98,47 @@ export function ColorPickerModal({ visible, onClose }: PickerProps) {
           </TouchableOpacity>
         ))}
       </View>
+    </CoreModal>
+  );
+}
+
+export function ThemePickerModal({ visible, onClose }: PickerProps) {
+  const { themeMode, setThemeMode, language, accentColor } = useFinanceStore();
+  const labels = LABELS[language];
+  const options: { code: ThemeMode; label: string; icon: string }[] = [
+    { code: 'light', label: labels.light, icon: 'sunny-outline' },
+    { code: 'dark', label: labels.dark, icon: 'moon-outline' },
+    { code: 'amoled', label: labels.amoled, icon: 'contrast-outline' },
+  ];
+
+  return (
+    <CoreModal visible={visible} onClose={onClose} title={labels.theme}>
+      <DefaultView style={styles.list}>
+        {options.map((opt) => (
+          <TouchableOpacity
+            key={opt.code}
+            style={[
+              styles.listItem,
+              themeMode === opt.code && { backgroundColor: `${accentColor}10` }
+            ]}
+            onPress={() => {
+              setThemeMode(opt.code);
+              onClose();
+            }}
+          >
+            <DefaultView style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons 
+                name={opt.icon as any} 
+                size={20} 
+                color={themeMode === opt.code ? accentColor : '#888'} 
+                style={{ marginRight: 12 }} 
+              />
+              <Text style={[styles.listText, themeMode === opt.code && { color: accentColor }]}>{opt.label}</Text>
+            </DefaultView>
+            {themeMode === opt.code && <Ionicons name="checkmark" size={20} color={accentColor} />}
+          </TouchableOpacity>
+        ))}
+      </DefaultView>
     </CoreModal>
   );
 }
