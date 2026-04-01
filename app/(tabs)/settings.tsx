@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, SectionList, TouchableOpacity, Switch, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, SectionList, TouchableOpacity, Switch, Platform, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
@@ -36,19 +36,15 @@ export default function SettingsScreen() {
     language,
   } = useFinanceStore();
 
+  const insets = useSafeAreaInsets();
   const labels = LABELS[language];
+  const themeColors = Colors[themeMode];
 
   const [currencyVisible, setCurrencyVisible] = useState(false);
   const [colorVisible, setColorVisible] = useState(false);
   const [langVisible, setLangVisible] = useState(false);
   const [themeVisible, setThemeVisible] = useState(false);
   const [resetVisible, setResetVisible] = useState(false);
-
-  const themeColors = Colors[themeMode];
-
-  const handleThemeChange = () => {
-    setThemeVisible(true);
-  };
 
   const SETTINGS_SECTIONS: SettingsSection[] = [
     {
@@ -74,7 +70,12 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <View style={[styles.container, { backgroundColor: themeColors.background, paddingTop: insets.top }]}>
+      <StatusBar 
+        barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'} 
+        backgroundColor="transparent"
+        translucent={true}
+      />
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.settings}</Text>
       </View>
@@ -140,8 +141,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 24,
+    paddingTop: 10,
     paddingBottom: 20,
   },
   headerTitle: {

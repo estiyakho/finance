@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { StyleSheet, FlatList, TouchableOpacity, TextInput, Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import TransactionCard from '@/components/TransactionCard';
@@ -25,6 +25,7 @@ export default function TransactionsScreen() {
     language
   } = useFinanceStore();
 
+  const insets = useSafeAreaInsets();
   const labels = LABELS[language];
   const themeColors = Colors[themeMode];
 
@@ -83,8 +84,17 @@ export default function TransactionsScreen() {
   }, [transactions, deleteTransactionId]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <StatusBar barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'} />
+    <View style={[styles.container, { backgroundColor: themeColors.background, paddingTop: insets.top }]}>
+      <StatusBar 
+        barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'} 
+        backgroundColor="transparent"
+        translucent={true}
+      />
+      
+      <View style={styles.topHeader}>
+        <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.home}</Text>
+      </View>
+
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id}
@@ -145,13 +155,22 @@ export default function TransactionsScreen() {
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={handleDelete}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  topHeader: {
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontFamily: 'MartianMono-Bold',
   },
   header: {
     paddingBottom: 12,

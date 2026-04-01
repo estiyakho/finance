@@ -1,12 +1,6 @@
-/**
- * Learn more about Light and Dark modes:
- * https://docs.expo.io/guides/color-schemes/
- */
-
 import { Text as DefaultText, View as DefaultView } from 'react-native';
-
 import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
+import { useFinanceStore } from '@/store/useFinanceStore';
 
 type ThemeProps = {
   lightColor?: string;
@@ -20,8 +14,9 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const { themeMode } = useFinanceStore();
+  const theme = themeMode === 'amoled' ? 'amoled' : (themeMode === 'dark' ? 'dark' : 'light');
+  const colorFromProps = props[theme === 'amoled' ? 'dark' : (theme === 'dark' ? 'dark' : 'light') as 'light' | 'dark'];
 
   if (colorFromProps) {
     return colorFromProps;

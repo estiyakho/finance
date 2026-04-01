@@ -66,7 +66,7 @@ export const LABELS: Record<Language, any> = {
     theme: 'Theme Mode',
     language: 'Language',
     currency: 'Currency',
-    resetData: 'Reset All Data',
+    resetData: 'Reset All',
     appearance: 'Appearance',
     preferences: 'Preferences',
     dataPrivacy: 'Data & Privacy',
@@ -93,7 +93,7 @@ export const LABELS: Record<Language, any> = {
     theme: 'থিম মোড',
     language: 'ভাষা',
     currency: 'মুদ্রা',
-    resetData: 'সব ডেটা মুছে ফেলুন',
+    resetData: 'সব মুছে ফেলুন', // "Reset All" translated to Bangla, simplified from "সব ডেটা মুছে ফেলুন"
     appearance: 'চেহারা',
     preferences: 'পছন্দসমূহ',
     dataPrivacy: 'ডেটা এবং গোপনীয়তা',
