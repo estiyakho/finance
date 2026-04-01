@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Transaction, useFinanceStore, LABELS } from '@/store/useFinanceStore';
 import Colors from '@/constants/Colors';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import ModernDatePickerModal from './ModernDatePickerModal';
 
 interface EditTransactionModalProps {
   visible: boolean;
@@ -145,13 +145,11 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
                   <Text style={[styles.dateValue, { color: themeColors.text }]}>{date}</Text>
                   <Ionicons name="calendar-outline" size={18} color={accentColor} />
                 </TouchableOpacity>
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisible}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                <ModernDatePickerModal
+                  visible={isDatePickerVisible}
+                  currentDateStr={date}
                   onConfirm={handleConfirmDate}
-                  onCancel={() => setDatePickerVisibility(false)}
-                  themeVariant={themeMode === 'light' ? 'light' : 'dark'}
+                  onClose={() => setDatePickerVisibility(false)}
                 />
               </View>
 
