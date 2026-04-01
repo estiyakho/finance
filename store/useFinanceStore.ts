@@ -50,7 +50,7 @@ export type Language = 'en' | 'bn';
 
 export const LABELS: Record<Language, any> = {
   en: {
-    home: 'Home',
+    home: 'Transactions',
     stats: 'Stats',
     settings: 'Settings',
     balance: 'Total Balance',
@@ -88,7 +88,7 @@ export const LABELS: Record<Language, any> = {
     expenseColor: 'Expense Color',
   },
   bn: {
-    home: 'হোম',
+    home: 'লেনদেন',
     stats: 'পরিসংখ্যান',
     settings: 'সেটিংস',
     balance: 'মোট ব্যালেন্স',

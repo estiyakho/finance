@@ -128,7 +128,6 @@ export default function TransactionsScreen() {
             <TransactionCard
               {...item}
               currency={currency}
-              onDelete={() => confirmDelete(item.id)}
             />
           </TouchableOpacity>
         )}
@@ -199,7 +198,7 @@ export default function TransactionsScreen() {
       />
 
       <TouchableOpacity style={[styles.fab, { backgroundColor: accentColor }]} onPress={handleAddTransaction}>
-        <Ionicons name="add" size={32} color={accentColor === '#FFFFFF' ? '#000' : '#FFF'} />
+        <Ionicons name="add" size={24} color={accentColor === '#FFFFFF' ? '#000' : '#FFF'} />
       </TouchableOpacity>
 
       <EditTransactionModal
@@ -300,9 +299,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 24,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,

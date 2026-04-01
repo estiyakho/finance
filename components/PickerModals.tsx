@@ -77,28 +77,45 @@ export function LanguagePickerModal({ visible, onClose }: PickerProps) {
 export function GenericColorPickerModal({ 
   visible, onClose, title, selectedColor, onSelectColor 
 }: PickerProps & { title: string, selectedColor: string, onSelectColor: (c: string) => void }) {
-  const colors = ['#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', '#FFFFFF', '#FF8C00', '#00FF7F', '#9C27B0', '#00BCD4'];
+  const colors = [
+    // Bright & Primary (Row 1-2)
+    '#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', 
+    '#FFFFFF', '#FF8C00', '#00FF7F', '#9C27B0', '#00BCD4',
+    // Neons & AMOLED accents (Row 3-4)
+    '#00E5FF', '#1DE9B6', '#B2FF59', '#EEFF41', '#FF4081', 
+    '#E040FB', '#7C4DFF', '#536DFE', '#FFAB40', '#FF6E40',
+    // Pastels & Soft Tones (Row 5-6)
+    '#F48FB1', '#CE93D8', '#B39DDB', '#9FA8DA', '#90CAF9', 
+    '#81D4FA', '#80CBC4', '#A5D6A7', '#E6EE9C', '#FFF59D',
+    // Deep & Earth (Row 7-8)
+    '#D81B60', '#8E24AA', '#5E35B1', '#3949AB', '#1E88E5', 
+    '#039BE5', '#00897B', '#43A047', '#7CB342', '#C0CA33',
+    '#FDD835', '#FFB300', '#FB8C00', '#F4511E', '#6D4C41',
+    '#757575', '#546E7A', '#F50057', '#00E676', '#D50000'
+  ];
 
   return (
     <CoreModal visible={visible} onClose={onClose} title={title}>
-      <View style={styles.grid}>
-        {colors.map((color) => (
-          <TouchableOpacity
-            key={color}
-            style={[
-              styles.colorCircle,
-              { backgroundColor: color },
-              selectedColor === color && { borderColor: '#FFF', borderWidth: 2 }
-            ]}
-            onPress={() => {
-              onSelectColor(color);
-              onClose();
-            }}
-          >
-            {selectedColor === color && <Ionicons name="checkmark" size={16} color={color === '#FFFFFF' ? '#000' : '#FFF'} />}
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView style={{ maxHeight: 300 }} fadingEdgeLength={20} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
+          {colors.map((color) => (
+            <TouchableOpacity
+              key={color}
+              style={[
+                styles.colorCircle,
+                { backgroundColor: color },
+                selectedColor === color && { borderColor: color === '#FFFFFF' ? '#333' : '#FFF', borderWidth: 2 }
+              ]}
+              onPress={() => {
+                onSelectColor(color);
+                onClose();
+              }}
+            >
+              {selectedColor === color && <Ionicons name="checkmark" size={16} color={color === '#FFFFFF' ? '#000' : '#FFF'} />}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </CoreModal>
   );
 }
