@@ -14,10 +14,15 @@ export interface Transaction {
 interface FinanceState {
   transactions: Transaction[];
   currency: string;
+  isAmoled: boolean;
+  accentColor: string;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
   updateTransaction: (id: string, updates: Partial<Omit<Transaction, 'id'>>) => void;
   setCurrency: (currency: string) => void;
+  setAmoled: (isAmoled: boolean) => void;
+  setAccentColor: (color: string) => void;
+  resetData: () => void;
   getTotalBalance: () => number;
   getTotalIncome: () => number;
   getTotalExpense: () => number;
@@ -26,13 +31,10 @@ interface FinanceState {
 export const useFinanceStore = create<FinanceState>()(
   persist(
     (set, get) => ({
-      transactions: [
-        { id: '1', title: 'Loan(Ammu)', amount: 1000.0, type: 'expense', date: 'Apr 1', time: '7:28 AM' },
-        { id: '2', title: 'syed', amount: 4000.0, type: 'income', date: 'Apr 1', time: '7:27 AM' },
-        { id: '3', title: 'Fare(Kaptai Raster matha)', amount: 70.0, type: 'expense', date: 'Mar 31', time: '1:55 PM' },
-        { id: '4', title: 'Previous month remaining', amount: 265.0, type: 'income', date: 'Mar 31', time: '1:56 PM' },
-      ],
+      transactions: [],
       currency: 'BDT',
+      isAmoled: true,
+      accentColor: '#00AEEF',
       addTransaction: (transaction) => set((state) => ({
         transactions: [
           { ...transaction, id: Math.random().toString(36).substring(7) },
@@ -46,17 +48,20 @@ export const useFinanceStore = create<FinanceState>()(
         transactions: state.transactions.map((t) => t.id === id ? { ...t, ...updates } : t)
       })),
       setCurrency: (currency) => set({ currency }),
+      setAmoled: (isAmoled) => set({ isAmoled }),
+      setAccentColor: (accentColor) => set({ accentColor }),
+      resetData: () => set({ transactions: [], currency: 'BDT', isAmoled: true, accentColor: '#00AEEF' }),
       getTotalBalance: () => {
         const { transactions } = get();
-        return transactions.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
+        return transactions.reduce((acc: number, t: Transaction) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);
       },
       getTotalIncome: () => {
         const { transactions } = get();
-        return transactions.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : 0), 0);
+        return transactions.reduce((acc: number, t: Transaction) => acc + (t.type === 'income' ? t.amount : 0), 0);
       },
       getTotalExpense: () => {
         const { transactions } = get();
-        return transactions.reduce((acc, t) => acc + (t.type === 'expense' ? t.amount : 0), 0);
+        return transactions.reduce((acc: number, t: Transaction) => acc + (t.type === 'expense' ? t.amount : 0), 0);
       },
     }),
     {

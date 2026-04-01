@@ -1,8 +1,8 @@
+import { useColorScheme } from '@/components/useColorScheme';
+import { useFinanceStore } from '@/store/useFinanceStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-
-import { useColorScheme } from '@/components/useColorScheme';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -13,42 +13,38 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { accentColor } = useFinanceStore();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#00AEEF',
+        tabBarActiveTintColor: accentColor,
         tabBarInactiveTintColor: '#666',
         tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          fontFamily: 'MartianMono',
+          fontSize: 10,
+          marginBottom: 10,
+        },
         tabBarStyle: {
           backgroundColor: '#000',
           borderTopColor: '#111',
-          height: 60,
-          paddingBottom: 8,
+          height: 80,
+          paddingTop: 10,
+          paddingBottom: 10,
         },
-        headerStyle: {
-          backgroundColor: '#000',
-        },
-        headerTitleStyle: {
-          color: '#FFF',
-          fontSize: 24,
-          fontWeight: '900',
-        },
-        headerShadowVisible: false,
+        headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
-          tabBarLabel: 'Transactions',
+          tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="receipt-outline" color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          title: 'Statistics',
           tabBarLabel: 'Stats',
           tabBarIcon: ({ color }) => <TabBarIcon name="pie-chart-outline" color={color} />,
         }}
@@ -56,7 +52,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
           tabBarLabel: 'Settings',
           tabBarIcon: ({ color }) => <TabBarIcon name="settings-outline" color={color} />,
         }}

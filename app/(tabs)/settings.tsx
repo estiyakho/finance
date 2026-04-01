@@ -1,17 +1,18 @@
 import React from 'react';
-import { StyleSheet, SectionList, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, SectionList, TouchableOpacity, Alert, Switch, View as DefaultView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore } from '@/store/useFinanceStore';
 
 const CURRENCIES = ['BDT', 'USD', 'EUR', 'GBP', 'INR', 'JPY'];
+const ACCENTS = ['#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', '#FFFFFF'];
 
 interface SettingsItem {
   id: string;
   label: string;
-  value: string | boolean;
+  value?: string | boolean;
   icon: string;
-  type?: string;
+  type?: 'text' | 'toggle' | 'color' | 'danger';
   onPress?: () => void;
 }
 
@@ -21,7 +22,15 @@ interface SettingsSection {
 }
 
 export default function SettingsScreen() {
-  const { currency, setCurrency } = useFinanceStore();
+  const { 
+    currency, 
+    setCurrency, 
+    isAmoled, 
+    setAmoled, 
+    accentColor, 
+    setAccentColor,
+    resetData 
+  } = useFinanceStore();
 
   const handleCurrencyChange = () => {
     Alert.alert(
@@ -35,13 +44,35 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleAccentChange = () => {
+    Alert.alert(
+      "Accent Color",
+      "Choose a theme accent",
+      ACCENTS.map(color => ({
+        text: color === accentColor ? `• ${color}` : color,
+        onPress: () => setAccentColor(color)
+      })),
+      { cancelable: true }
+    );
+  };
+
+  const handleReset = () => {
+    Alert.alert(
+      "Reset All Data",
+      "This will permanently delete all transactions and settings. proceed?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Reset", style: "destructive", onPress: resetData }
+      ]
+    );
+  };
+
   const SETTINGS_SECTIONS: SettingsSection[] = [
     {
       title: 'Appearance',
       data: [
-        { id: 'theme', label: 'Theme', value: 'Dark', icon: 'sunny-outline', type: 'text' },
-        { id: 'amoled', label: 'AMOLED Theme', type: 'toggle', value: true, icon: 'tablet-portrait-outline' },
-        { id: 'accent', label: 'Accent Color', type: 'color', value: '#00AEEF', icon: 'color-palette-outline' },
+        { id: 'amoled', label: 'AMOLED Mode', type: 'toggle', value: isAmoled, icon: 'moon-outline' },
+        { id: 'accent', label: 'Accent Color', type: 'color', value: accentColor, icon: 'color-palette-outline', onPress: handleAccentChange },
       ],
     },
     {
@@ -52,42 +83,61 @@ export default function SettingsScreen() {
       ],
     },
     {
-      title: 'App Preferences',
+      title: 'Data & Privacy',
       data: [
-        { id: 'default_screen', label: 'Default Screen', value: 'Transactions', icon: 'layers-outline', type: 'text' },
+        { id: 'reset', label: 'Reset All Data', type: 'danger', icon: 'refresh-outline', onPress: handleReset },
       ],
     },
   ];
 
   return (
     <View style={[styles.container, { backgroundColor: '#000' }]}>
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: accentColor }]}>Settings</Text>
+      </View>
+
       <SectionList
         sections={SETTINGS_SECTIONS}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity 
-            style={[styles.item, { backgroundColor: '#111' }]} 
+            style={[styles.item, { backgroundColor: '#0A0A0A' }]} 
             onPress={item.onPress}
-            disabled={!item.onPress && !item.type}
+            disabled={item.type === 'toggle'}
+            activeOpacity={0.7}
           >
             <View style={styles.itemLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: '#1A1A1A' }]}>
-                <Ionicons name={item.icon as any} size={18} color={item.id === 'accent' ? '#00AEEF' : '#666'} />
+              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? '#1E1414' : '#111' }]}>
+                <Ionicons 
+                  name={item.icon as any} 
+                  size={18} 
+                  color={item.type === 'danger' ? '#FF5252' : item.type === 'color' ? accentColor : '#666'} 
+                />
               </View>
-              <Text style={styles.itemLabel}>{item.label}</Text>
+              <Text style={[styles.itemLabel, item.type === 'danger' && styles.dangerText]}>
+                {item.label}
+              </Text>
             </View>
+
             <View style={styles.itemRight}>
               {item.type === 'toggle' ? (
-                <View style={[styles.toggle, { backgroundColor: item.value ? '#FFF' : '#333' }]} />
+                <Switch
+                  value={item.value as boolean}
+                  onValueChange={setAmoled}
+                  trackColor={{ false: '#333', true: accentColor }}
+                  thumbColor="#FFF"
+                />
               ) : item.type === 'color' ? (
                 <View style={styles.colorValue}>
                   <View style={[styles.colorDot, { backgroundColor: item.value as string }]} />
-                  <Ionicons name="chevron-forward" size={16} color="#444" />
+                  <Ionicons name="chevron-forward" size={14} color="#333" />
                 </View>
+              ) : item.type === 'danger' ? (
+                <Ionicons name="chevron-forward" size={14} color="#333" />
               ) : (
                 <View style={styles.textValue}>
                   <Text style={styles.itemValue}>{item.value}</Text>
-                  <Ionicons name="chevron-forward" size={16} color="#444" />
+                  <Ionicons name="chevron-forward" size={14} color="#333" />
                 </View>
               )}
             </View>
@@ -107,76 +157,89 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    paddingTop: 60,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    backgroundColor: '#000',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontFamily: 'MartianMono-Bold',
+  },
   listContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 40,
+    paddingBottom: 100,
   },
   sectionHeader: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#00AEEF',
-    marginTop: 20,
-    marginBottom: 8,
+    fontSize: 10,
+    fontFamily: 'MartianMono-Bold',
+    color: '#444',
+    marginTop: 24,
+    marginBottom: 12,
+    marginHorizontal: 8,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    marginVertical: 3,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 18,
+    marginVertical: 4,
     borderWidth: 1,
-    borderColor: '#1A1A1A',
+    borderColor: '#111',
   },
   itemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 14,
   },
   itemLabel: {
     fontSize: 14,
-    color: '#DDD',
-    fontWeight: '500',
+    fontFamily: 'MartianMono',
+    color: '#EEE',
+  },
+  dangerText: {
+    color: '#FF5252',
   },
   itemRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   textValue: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   itemValue: {
-    fontSize: 13,
+    fontSize: 12,
+    fontFamily: 'MartianMono',
     color: '#666',
-    marginRight: 4,
-  },
-  toggle: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#333',
+    marginRight: 6,
   },
   colorValue: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   colorDot: {
     width: 16,
     height: 16,
     borderRadius: 8,
-    marginRight: 4,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#333',
   },
 });
