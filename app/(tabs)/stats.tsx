@@ -12,7 +12,7 @@ export default function StatsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: accentColor }]}>{labels.stats}</Text>
+        <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.stats}</Text>
       </View>
       <View style={styles.center}>
         <Text style={{ color: themeColors.textSecondary, fontFamily: 'MartianMono' }}>

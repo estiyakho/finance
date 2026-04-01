@@ -42,7 +42,6 @@ export default function TransactionCard({ title, amount, type, date, currency, o
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0A0A0A',
     borderRadius: 16,
     padding: 14,
     flexDirection: 'row',
@@ -50,7 +49,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#111',
   },
   leftSection: {
     flexDirection: 'row',
@@ -63,7 +61,6 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: '#333',
     marginRight: 14,
   },
   textContainer: {
@@ -73,13 +70,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontFamily: 'MartianMono-Bold',
-    color: '#FFF',
     marginBottom: 4,
   },
   dateText: {
     fontSize: 10,
     fontFamily: 'MartianMono',
-    color: '#666',
   },
   rightSection: {
     flexDirection: 'row',
@@ -92,13 +87,11 @@ const styles = StyleSheet.create({
     fontFamily: 'MartianMono-Bold',
   },
   deleteButton: {
-    backgroundColor: '#1E1414',
     width: 32,
     height: 32,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#2A1A1A',
   },
 });

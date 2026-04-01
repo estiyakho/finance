@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
   },
   searchContainer: {
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 20,
     paddingHorizontal: 18,
-    marginTop: Platform.OS === 'ios' ? 20 : 40,
+    marginTop: 8,
     marginBottom: 20,
     height: 54,
     borderWidth: 1,

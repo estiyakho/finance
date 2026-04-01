@@ -12,7 +12,7 @@ interface FinanceSummaryBoxProps {
 }
 
 export default function FinanceSummaryBox({ balance, income, expense, currency }: FinanceSummaryBoxProps) {
-  const { themeMode, language } = useFinanceStore();
+  const { themeMode, language, accentColor } = useFinanceStore();
   const labels = LABELS[language];
   const themeColors = Colors[themeMode];
 
@@ -20,7 +20,7 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
     <View style={[styles.container, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
       <View style={styles.topSection}>
         <View style={[styles.iconContainer, { backgroundColor: themeColors.backgroundSecondary }]}>
-          <Ionicons name="wallet-outline" size={24} color={useFinanceStore().accentColor} />
+          <Ionicons name="wallet-outline" size={24} color={accentColor} />
         </View>
         <View style={styles.balanceInfo}>
           <Text style={[styles.amountMain, { color: themeColors.text }]}>{`${currency} ${balance.toLocaleString()}`}</Text>
@@ -46,12 +46,10 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1E1E1E',
     borderRadius: 24,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
   },
   topSection: {
     flexDirection: 'row',
@@ -59,7 +57,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   iconContainer: {
-    backgroundColor: '#1A2A2A',
     width: 48,
     height: 48,
     borderRadius: 16,
@@ -72,7 +69,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    color: '#666',
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     marginBottom: 4,
@@ -81,11 +77,9 @@ const styles = StyleSheet.create({
   amountMain: {
     fontSize: 22,
     fontFamily: 'MartianMono-Bold',
-    color: '#FFF',
   },
   divider: {
     height: 1,
-    backgroundColor: '#111',
     marginVertical: 16,
   },
   bottomSection: {
@@ -102,18 +96,15 @@ const styles = StyleSheet.create({
   statAmount: {
     fontSize: 14,
     fontFamily: 'MartianMono-Bold',
-    color: '#EEE',
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 9,
     fontFamily: 'MartianMono',
-    color: '#666',
     textTransform: 'uppercase',
   },
   verticalDivider: {
     width: 1,
     height: 24,
-    backgroundColor: '#111',
   },
 });

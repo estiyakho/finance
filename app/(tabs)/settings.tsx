@@ -76,7 +76,7 @@ export default function SettingsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: accentColor }]}>{labels.settings}</Text>
+        <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.settings}</Text>
       </View>
 
       <SectionList
@@ -90,7 +90,7 @@ export default function SettingsScreen() {
             disabled={!item.onPress}
           >
             <View style={styles.itemLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? '#1E1414' : themeColors.backgroundSecondary }]}>
+              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? `${Colors.dark.border}80` : themeColors.backgroundSecondary }]}>
                 <Ionicons 
                   name={item.icon as any} 
                   size={18} 
