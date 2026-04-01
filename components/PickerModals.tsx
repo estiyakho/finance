@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, View as DefaultView } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
@@ -77,45 +77,73 @@ export function LanguagePickerModal({ visible, onClose }: PickerProps) {
 export function GenericColorPickerModal({ 
   visible, onClose, title, selectedColor, onSelectColor 
 }: PickerProps & { title: string, selectedColor: string, onSelectColor: (c: string) => void }) {
-  const colors = [
-    // Bright & Primary (Row 1-2)
-    '#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', 
-    '#FFFFFF', '#FF8C00', '#00FF7F', '#9C27B0', '#00BCD4',
-    // Neons & AMOLED accents (Row 3-4)
-    '#00E5FF', '#1DE9B6', '#B2FF59', '#EEFF41', '#FF4081', 
-    '#E040FB', '#7C4DFF', '#536DFE', '#FFAB40', '#FF6E40',
-    // Pastels & Soft Tones (Row 5-6)
-    '#F48FB1', '#CE93D8', '#B39DDB', '#9FA8DA', '#90CAF9', 
-    '#81D4FA', '#80CBC4', '#A5D6A7', '#E6EE9C', '#FFF59D',
-    // Deep & Earth (Row 7-8)
-    '#D81B60', '#8E24AA', '#5E35B1', '#3949AB', '#1E88E5', 
-    '#039BE5', '#00897B', '#43A047', '#7CB342', '#C0CA33',
-    '#FDD835', '#FFB300', '#FB8C00', '#F4511E', '#6D4C41',
-    '#757575', '#546E7A', '#F50057', '#00E676', '#D50000'
+  const COLOR_PALETTES = [
+    { name: 'Red', hex: '#F44336', shades: ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C', '#D50000'] },
+    { name: 'Pink', hex: '#E91E63', shades: ['#FCE4EC', '#F8BBD0', '#F48FB1', '#F06292', '#E91E63', '#D81B60', '#C2185B', '#AD1457', '#880E4F', '#C51162'] },
+    { name: 'Purple', hex: '#9C27B0', shades: ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#9C27B0', '#8E24AA', '#7B1FA2', '#6A1B9A', '#4A148C', '#AA00FF'] },
+    { name: 'Blue', hex: '#2196F3', shades: ['#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#2196F3', '#1E88E5', '#1976D2', '#1565C0', '#0D47A1', '#2962FF'] },
+    { name: 'Cyan', hex: '#00BCD4', shades: ['#E0F7FA', '#B2EBF2', '#80DEEA', '#4DD0E1', '#00BCD4', '#00ACC1', '#0097A7', '#00838F', '#006064', '#00B8D4'] },
+    { name: 'Teal', hex: '#009688', shades: ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#009688', '#00897B', '#00796B', '#00695C', '#004D40', '#00BFA5'] },
+    { name: 'Green', hex: '#4CAF50', shades: ['#E8F5E9', '#C8E6C9', '#A5D6A7', '#81C784', '#4CAF50', '#43A047', '#388E3C', '#2E7D32', '#1B5E20', '#00E676'] },
+    { name: 'Yellow', hex: '#FFEB3B', shades: ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEB3B', '#FDD835', '#FBC02D', '#F9A825', '#F57F17', '#FFEA00'] },
+    { name: 'Orange', hex: '#FF9800', shades: ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FF9800', '#FB8C00', '#F57C00', '#EF6C00', '#E65100', '#FF6D00'] },
+    { name: 'Grey', hex: '#9E9E9E', shades: ['#FFFFFF', '#F5F5F5', '#E0E0E0', '#BDBDBD', '#9E9E9E', '#757575', '#616161', '#424242', '#212121', '#000000'] }
   ];
+
+  const [activePaletteIndex, setActivePaletteIndex] = useState(0);
+
+  useEffect(() => {
+    if (visible && selectedColor) {
+      const idx = COLOR_PALETTES.findIndex(p => p.shades.includes(selectedColor.toUpperCase()) || p.hex === selectedColor.toUpperCase());
+      if (idx !== -1) setActivePaletteIndex(idx);
+    }
+  }, [visible, selectedColor]);
+
+  const { themeMode } = useFinanceStore();
+  const themeColors = Colors[themeMode];
 
   return (
     <CoreModal visible={visible} onClose={onClose} title={title}>
-      <ScrollView style={{ maxHeight: 300 }} fadingEdgeLength={20} showsVerticalScrollIndicator={false}>
+      <View style={{ width: '100%', alignItems: 'center' }}>
+        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Base Color</Text>
         <View style={styles.grid}>
-          {colors.map((color) => (
+          {COLOR_PALETTES.map((palette, index) => (
             <TouchableOpacity
-              key={color}
+              key={palette.name}
               style={[
                 styles.colorCircle,
-                { backgroundColor: color },
-                selectedColor === color && { borderColor: color === '#FFFFFF' ? '#333' : '#FFF', borderWidth: 2 }
+                { backgroundColor: palette.hex },
+                activePaletteIndex === index && { borderColor: palette.hex === '#FFFFFF' ? '#333' : '#FFF', borderWidth: 2 }
               ]}
-              onPress={() => {
-                onSelectColor(color);
-                onClose();
-              }}
+              onPress={() => setActivePaletteIndex(index)}
             >
-              {selectedColor === color && <Ionicons name="checkmark" size={16} color={color === '#FFFFFF' ? '#000' : '#FFF'} />}
+              {activePaletteIndex === index && <Ionicons name="checkmark" size={16} color={palette.hex === '#FFFFFF' ? '#000' : '#FFF'} />}
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
+
+        <View style={[styles.paletteDivider, { backgroundColor: themeColors.border }]} />
+
+        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>Select Shade</Text>
+        <View style={styles.grid}>
+          {COLOR_PALETTES[activePaletteIndex].shades.map((shade) => (
+            <TouchableOpacity
+              key={shade}
+              style={[
+                styles.colorCircle,
+                { backgroundColor: shade },
+                selectedColor === shade && { borderColor: shade === '#FFFFFF' ? '#333' : '#FFF', borderWidth: 2 }
+              ]}
+              onPress={() => {
+                onSelectColor(shade);
+                onClose();
+              }}
+            >
+              {selectedColor === shade && <Ionicons name="radio-button-on" size={18} color={shade === '#FFFFFF' ? '#000' : (shade === '#000000' ? '#FFF' : '#FFF')} />}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
     </CoreModal>
   );
 }
@@ -306,6 +334,24 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#666',
     marginTop: 2,
+  },
+  optionLabel: {
+    fontFamily: 'MartianMono',
+    fontSize: 16,
+    marginLeft: 15,
+  },
+  sectionTitle: {
+    fontFamily: 'MartianMono',
+    fontSize: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+    marginTop: 5,
+    textTransform: 'uppercase',
+  },
+  paletteDivider: {
+    height: 1,
+    width: '100%',
+    marginVertical: 15,
   },
   colorCircle: {
     width: 50,
