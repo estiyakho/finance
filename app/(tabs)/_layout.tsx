@@ -1,5 +1,6 @@
 import { useColorScheme } from '@/components/useColorScheme';
-import { useFinanceStore } from '@/store/useFinanceStore';
+import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
@@ -13,13 +14,15 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  const { accentColor } = useFinanceStore();
+  const { accentColor, language, themeMode } = useFinanceStore();
+  const labels = LABELS[language];
+  const themeColors = Colors[themeMode];
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: accentColor,
-        tabBarInactiveTintColor: '#666',
+        tabBarInactiveTintColor: themeColors.textSecondary,
         tabBarShowLabel: true,
         tabBarLabelStyle: {
           fontFamily: 'MartianMono',
@@ -27,8 +30,8 @@ export default function TabLayout() {
           marginBottom: 10,
         },
         tabBarStyle: {
-          backgroundColor: '#000',
-          borderTopColor: '#111',
+          backgroundColor: themeColors.background,
+          borderTopColor: themeColors.border,
           height: 80,
           paddingTop: 10,
           paddingBottom: 10,
@@ -38,21 +41,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: labels.home,
           tabBarIcon: ({ color }) => <TabBarIcon name="receipt-outline" color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          tabBarLabel: 'Stats',
+          tabBarLabel: labels.stats,
           tabBarIcon: ({ color }) => <TabBarIcon name="pie-chart-outline" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: labels.settings,
           tabBarIcon: ({ color }) => <TabBarIcon name="settings-outline" color={color} />,
         }}
       />

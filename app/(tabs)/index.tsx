@@ -1,24 +1,31 @@
-import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
-import EditTransactionModal from '@/components/EditTransactionModal';
-import FinanceSummaryBox from '@/components/FinanceSummaryBox';
-import { View } from '@/components/Themed';
-import TransactionCard from '@/components/TransactionCard';
-import { Transaction, useFinanceStore } from '@/store/useFinanceStore';
+import React, { useState, useMemo } from 'react';
+import { StyleSheet, FlatList, TouchableOpacity, TextInput, SafeAreaView, Platform, StatusBar } from 'react-native';
+import { Text, View, useThemeColor } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import TransactionCard from '@/components/TransactionCard';
+import FinanceSummaryBox from '@/components/FinanceSummaryBox';
+import EditTransactionModal from '@/components/EditTransactionModal';
+import DeleteConfirmationModal from '@/components/DeleteConfirmationModal';
+import { useFinanceStore, Transaction, LABELS } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
 
 export default function TransactionsScreen() {
-  const {
-    transactions,
-    currency,
-    addTransaction,
+  const { 
+    transactions, 
+    currency, 
+    addTransaction, 
     deleteTransaction,
     updateTransaction,
     getTotalBalance,
     getTotalIncome,
-    getTotalExpense
+    getTotalExpense,
+    accentColor,
+    themeMode,
+    language
   } = useFinanceStore();
+
+  const labels = LABELS[language];
+  const themeColors = Colors[themeMode];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -27,14 +34,14 @@ export default function TransactionsScreen() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(t =>
+    return transactions.filter(t => 
       t.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [transactions, searchQuery]);
 
   const handleAddTransaction = () => {
     const newTx: Omit<Transaction, 'id'> = {
-      title: 'New Entry',
+      title: labels.newEntry,
       amount: 0,
       type: 'expense',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -69,32 +76,8 @@ export default function TransactionsScreen() {
   }, [transactions, deleteTransactionId]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: '#000' }]}>
-      <View style={styles.topContainer}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search transactions..."
-            placeholderTextColor="#444"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery !== '' && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color="#666" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <FinanceSummaryBox
-          balance={getTotalBalance()}
-          income={getTotalIncome()}
-          expense={getTotalExpense()}
-          currency={currency}
-        />
-      </View>
-
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
+      <StatusBar barStyle={themeMode === 'light' ? 'dark-content' : 'light-content'} />
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id}
@@ -107,11 +90,37 @@ export default function TransactionsScreen() {
             />
           </TouchableOpacity>
         )}
+        ListHeaderComponent={
+          <View style={[styles.header, { backgroundColor: 'transparent' }]}>
+            <View style={[styles.searchContainer, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+              <Ionicons name="search" size={18} color={themeColors.textSecondary} style={styles.searchIcon} />
+              <TextInput
+                style={[styles.searchInput, { color: themeColors.text }]}
+                placeholder={labels.search}
+                placeholderTextColor={themeColors.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery !== '' && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Ionicons name="close-circle" size={18} color={themeColors.textSecondary} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <FinanceSummaryBox 
+              balance={getTotalBalance()}
+              income={getTotalIncome()}
+              expense={getTotalExpense()}
+              currency={currency}
+            />
+          </View>
+        }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.fab} onPress={handleAddTransaction}>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: accentColor }]} onPress={handleAddTransaction}>
         <Ionicons name="add" size={32} color="#FFF" />
       </TouchableOpacity>
 
@@ -137,29 +146,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  topContainer: {
+  header: {
     paddingHorizontal: 16,
-    backgroundColor: '#000',
     paddingBottom: 12,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A0A0A',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    marginTop: 40,
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    marginTop: Platform.OS === 'ios' ? 20 : 40,
     marginBottom: 20,
-    height: 50,
+    height: 54,
     borderWidth: 1,
-    borderColor: '#111',
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    color: '#FFF',
     fontFamily: 'MartianMono',
     fontSize: 13,
   },
@@ -171,16 +176,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#00AEEF',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 6,
   },
 });

@@ -11,17 +11,75 @@ export interface Transaction {
   time: string;
 }
 
+export type ThemeMode = 'light' | 'dark' | 'amoled';
+export type Language = 'en' | 'bn';
+
+export const LABELS: Record<Language, any> = {
+  en: {
+    home: 'Home',
+    stats: 'Stats',
+    settings: 'Settings',
+    balance: 'Total Balance',
+    income: 'Income',
+    expense: 'Expense',
+    search: 'Search transactions...',
+    newEntry: 'New Entry',
+    editTx: 'Edit Transaction',
+    deleteTx: 'Delete Transaction',
+    confirmDelete: 'Are you sure you want to delete this?',
+    cancel: 'Cancel',
+    save: 'Save Changes',
+    delete: 'Delete',
+    theme: 'Theme Mode',
+    language: 'Language',
+    currency: 'Currency',
+    resetData: 'Reset All Data',
+    appearance: 'Appearance',
+    preferences: 'Preferences',
+    dataPrivacy: 'Data & Privacy',
+    amoled: 'AMOLED Mode',
+    accent: 'Accent Color',
+  },
+  bn: {
+    home: 'হোম',
+    stats: 'পরিসংখ্যান',
+    settings: 'সেটিংস',
+    balance: 'মোট ব্যালেন্স',
+    income: 'আয়',
+    expense: 'ব্যয়',
+    search: 'লেনদেন খুঁজুন...',
+    newEntry: 'নতুন এন্ট্রি',
+    editTx: 'লেনদেন সম্পাদনা',
+    deleteTx: 'লেনদেন মুছুন',
+    confirmDelete: 'আপনি কি এটি মুছতে নিশ্চিত?',
+    cancel: 'বাতিল',
+    save: 'পরিবর্তন সংরক্ষণ',
+    delete: 'মুছুন',
+    theme: 'থিম মোড',
+    language: 'ভাষা',
+    currency: 'মুদ্রা',
+    resetData: 'সব ডেটা মুছে ফেলুন',
+    appearance: 'চেহারা',
+    preferences: 'পছন্দসমূহ',
+    dataPrivacy: 'ডেটা এবং গোপনীয়তা',
+    amoled: 'AMOLED মোড',
+    accent: 'অ্যাকসেন্ট কালার',
+  }
+};
+
 interface FinanceState {
   transactions: Transaction[];
   currency: string;
-  isAmoled: boolean;
+  themeMode: ThemeMode;
   accentColor: string;
+  language: Language;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   deleteTransaction: (id: string) => void;
   updateTransaction: (id: string, updates: Partial<Omit<Transaction, 'id'>>) => void;
   setCurrency: (currency: string) => void;
-  setAmoled: (isAmoled: boolean) => void;
+  setThemeMode: (themeMode: ThemeMode) => void;
   setAccentColor: (color: string) => void;
+  setLanguage: (lang: Language) => void;
   resetData: () => void;
   getTotalBalance: () => number;
   getTotalIncome: () => number;
@@ -33,8 +91,9 @@ export const useFinanceStore = create<FinanceState>()(
     (set, get) => ({
       transactions: [],
       currency: 'BDT',
-      isAmoled: true,
+      themeMode: 'amoled',
       accentColor: '#00AEEF',
+      language: 'en',
       addTransaction: (transaction) => set((state) => ({
         transactions: [
           { ...transaction, id: Math.random().toString(36).substring(7) },
@@ -48,9 +107,10 @@ export const useFinanceStore = create<FinanceState>()(
         transactions: state.transactions.map((t) => t.id === id ? { ...t, ...updates } : t)
       })),
       setCurrency: (currency) => set({ currency }),
-      setAmoled: (isAmoled) => set({ isAmoled }),
+      setThemeMode: (themeMode) => set({ themeMode }),
       setAccentColor: (accentColor) => set({ accentColor }),
-      resetData: () => set({ transactions: [], currency: 'BDT', isAmoled: true, accentColor: '#00AEEF' }),
+      setLanguage: (language) => set({ language }),
+      resetData: () => set({ transactions: [], currency: 'BDT', themeMode: 'amoled', accentColor: '#00AEEF', language: 'en' }),
       getTotalBalance: () => {
         const { transactions } = get();
         return transactions.reduce((acc: number, t: Transaction) => acc + (t.type === 'income' ? t.amount : -t.amount), 0);

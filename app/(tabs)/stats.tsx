@@ -1,48 +1,111 @@
-import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import { BarChart, PieChart } from "react-native-gifted-charts";
+import { useFinanceStore, LABELS } from '@/store/useFinanceStore';
 import { Ionicons } from '@expo/vector-icons';
 
+const SCREEN_WIDTH = Dimensions.get('window').width;
+
 export default function StatsScreen() {
+  const { transactions, currency, accentColor, language } = useFinanceStore();
+  const labels = LABELS[language];
+
+  const totalIncome = useMemo(() => 
+    transactions.reduce((acc, t) => acc + (t.type === 'income' ? t.amount : 0), 0),
+    [transactions]
+  );
+  
+  const totalExpense = useMemo(() => 
+    transactions.reduce((acc, t) => acc + (t.type === 'expense' ? t.amount : 0), 0),
+    [transactions]
+  );
+
+  const barData = useMemo(() => {
+    // Group last 7 days or just show Income vs Expense for now
+    return [
+      { 
+        value: totalIncome, 
+        label: labels.income, 
+        frontColor: '#4CAF50',
+        gradientColor: '#4CAF50',
+        spacing: 40,
+        labelTextStyle: { color: '#666', fontFamily: 'MartianMono', fontSize: 10 }
+      },
+      { 
+        value: totalExpense, 
+        label: labels.expense, 
+        frontColor: '#FF5252',
+        gradientColor: '#FF5252',
+        labelTextStyle: { color: '#666', fontFamily: 'MartianMono', fontSize: 10 }
+      },
+    ];
+  }, [totalIncome, totalExpense, labels]);
+
+  const pieData = useMemo(() => [
+    { value: totalIncome, color: '#4CAF50', text: 'Income' },
+    { value: totalExpense, color: '#FF5252', text: 'Expense' },
+  ], [totalIncome, totalExpense]);
+
   return (
-    <View style={[styles.container, { backgroundColor: '#121212' }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.monthHeader}>
-          <Ionicons name="chevron-back" size={24} color="#888" />
-          <Text style={styles.monthText}>April 2026</Text>
-          <Ionicons name="chevron-forward" size={24} color="#888" />
-        </View>
+    <View style={[styles.container, { backgroundColor: '#000' }]}>
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: accentColor }]}>{labels.stats}</Text>
+      </View>
 
-        <View style={styles.summaryGrid}>
-          <View style={[styles.summaryCard, { backgroundColor: '#1E1E1E' }]}>
-            <Text style={styles.summaryLabel}>Total Income</Text>
-            <Text style={[styles.summaryValue, { color: '#4CAF50' }]}>BDT 4,265.0</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.summaryCard}>
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>{labels.income}</Text>
+            <Text style={[styles.summaryValue, { color: '#4CAF50' }]}>{`${currency} ${totalIncome.toLocaleString()}`}</Text>
           </View>
-
-          <View style={[styles.summaryCard, { backgroundColor: '#1E1E1E' }]}>
-            <Text style={styles.summaryLabel}>Total Expense</Text>
-            <Text style={[styles.summaryValue, { color: '#FF5252' }]}>BDT 1,070.0</Text>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryItem}>
+            <Text style={styles.summaryLabel}>{labels.expense}</Text>
+            <Text style={[styles.summaryValue, { color: '#FF5252' }]}>{`${currency} ${totalExpense.toLocaleString()}`}</Text>
           </View>
         </View>
 
-        <View style={[styles.mainCard, { backgroundColor: '#1E1E1E' }]}>
-          <Text style={styles.cardTitle}>Monthly Savings</Text>
-          <Text style={styles.savingsValue}>BDT 3,195.0</Text>
-          <View style={styles.progressBarBg}>
-            <View style={[styles.progressBarFill, { width: '75%' }]} />
+        <View style={styles.chartSection}>
+          <Text style={styles.chartTitle}>Income vs Expense</Text>
+          <View style={styles.chartWrapper}>
+            <BarChart
+              data={barData}
+              barWidth={60}
+              noRotation
+              dashGap={0}
+              hideRules
+              yAxisThickness={0}
+              xAxisThickness={0}
+              hideYAxisText
+              isAnimated
+              animationDuration={800}
+            />
           </View>
-          <Text style={styles.progressText}>75% of income saved</Text>
         </View>
 
-        <View style={[styles.listCard, { backgroundColor: '#1E1E1E' }]}>
-          <Text style={styles.cardTitle}>Daily Average</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Income / Day</Text>
-            <Text style={styles.detailValue}>BDT 142.1</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Expense / Day</Text>
-            <Text style={styles.detailValue}>BDT 35.6</Text>
+        <View style={[styles.chartSection, { marginBottom: 40 }]}>
+          <Text style={styles.chartTitle}>Distribution</Text>
+          <View style={styles.pieWrapper}>
+            <PieChart
+              data={pieData}
+              donut
+              sectionAutoFocus
+              radius={80}
+              innerRadius={60}
+              innerCircleColor={'#000'}
+              centerLabelComponent={() => {
+                const perc = totalIncome + totalExpense > 0 
+                  ? Math.round((totalExpense / (totalIncome + totalExpense)) * 100)
+                  : 0;
+                return (
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 20, color: 'white', fontFamily: 'MartianMono-Bold' }}>{perc}%</Text>
+                    <Text style={{ fontSize: 10, color: '#666', fontFamily: 'MartianMono' }}>Exp</Text>
+                  </View>
+                );
+              }}
+            />
           </View>
         </View>
       </ScrollView>
@@ -54,95 +117,73 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    paddingTop: 60,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    backgroundColor: '#000',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontFamily: 'MartianMono-Bold',
+  },
   scrollContent: {
-    padding: 16,
-  },
-  monthHeader: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  monthText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFF',
-    marginHorizontal: 16,
-  },
-  summaryGrid: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 40,
   },
   summaryCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 16,
+    flexDirection: 'row',
+    backgroundColor: '#0A0A0A',
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
+    borderColor: '#111',
+  },
+  summaryItem: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   summaryLabel: {
-    fontSize: 12,
-    color: '#888',
-    marginBottom: 4,
-    fontWeight: '500',
+    fontSize: 10,
+    fontFamily: 'MartianMono',
+    color: '#666',
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    marginBottom: 8,
   },
   summaryValue: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: 'MartianMono-Bold',
   },
-  mainCard: {
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#888',
-    marginBottom: 12,
-  },
-  savingsValue: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#FFF',
-    marginBottom: 16,
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: '#333',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  progressBarFill: {
+  summaryDivider: {
+    width: 1,
     height: '100%',
-    backgroundColor: '#00AEEF',
-    borderRadius: 4,
+    backgroundColor: '#111',
   },
-  progressText: {
-    fontSize: 12,
-    color: '#888',
-  },
-  listCard: {
+  chartSection: {
+    backgroundColor: '#0A0A0A',
+    borderRadius: 24,
     padding: 20,
-    borderRadius: 20,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#2A2A2A',
+    borderColor: '#111',
   },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  detailLabel: {
+  chartTitle: {
     fontSize: 14,
+    fontFamily: 'MartianMono-Bold',
     color: '#FFF',
+    marginBottom: 24,
   },
-  detailValue: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '500',
+  chartWrapper: {
+    alignItems: 'center',
+    paddingRight: 20,
+    backgroundColor: 'transparent',
+  },
+  pieWrapper: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: 'transparent',
   },
 });

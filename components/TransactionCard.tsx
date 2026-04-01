@@ -1,26 +1,30 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Text, View } from './Themed';
 
-import { Transaction } from '@/store/useFinanceStore';
+import { Transaction, useFinanceStore } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
 
 interface TransactionCardProps extends Transaction {
-  onDelete?: () => void;
   currency: string;
+  onDelete?: () => void;
 }
 
-export default function TransactionCard({ title, amount, type, date, onDelete, currency }: TransactionCardProps) {
-  const isExpense = type === 'expense';
-  const amountColor = isExpense ? '#FF5252' : '#4CAF50';
-  const prefix = isExpense ? '-' : '';
+export default function TransactionCard({ title, amount, type, date, currency, onDelete }: TransactionCardProps) {
+  const { themeMode } = useFinanceStore();
+  const themeColors = Colors[themeMode];
+  
+  const amountColor = type === 'income' ? '#4CAF50' : '#FF5252';
+  const prefix = type === 'income' ? '+' : '-';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
       <View style={styles.leftSection}>
-        <View style={styles.radioPlaceholder} />
+        <View style={[styles.radioPlaceholder, { borderColor: themeColors.border }]} />
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.dateText}>{date}</Text>
+          <Text style={[styles.title, { color: themeColors.text }]}>{title}</Text>
+          <Text style={[styles.dateText, { color: themeColors.textSecondary }]}>{date}</Text>
         </View>
       </View>
 
@@ -28,7 +32,7 @@ export default function TransactionCard({ title, amount, type, date, onDelete, c
         <Text style={[styles.amount, { color: amountColor }]}>
           {`${prefix}${currency} ${amount.toLocaleString()}`}
         </Text>
-        <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: `${themeColors.border}50`, borderColor: themeColors.border }]} onPress={onDelete}>
           <Ionicons name="trash-outline" size={16} color="#FF5252" />
         </TouchableOpacity>
       </View>

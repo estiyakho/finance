@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Modal, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import { Transaction } from '@/store/useFinanceStore';
+import { Transaction, useFinanceStore, LABELS } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 interface EditTransactionModalProps {
   visible: boolean;
@@ -12,9 +14,11 @@ interface EditTransactionModalProps {
   onDelete: (id: string) => void;
 }
 
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
 export default function EditTransactionModal({ visible, transaction, onClose, onSave, onDelete }: EditTransactionModalProps) {
+  const { themeMode, language } = useFinanceStore();
+  const themeColors = Colors[themeMode];
+  const labels = LABELS[language];
+
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
@@ -55,7 +59,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       onRequestClose={onClose}
     >
       <TouchableOpacity 
-        style={styles.overlay} 
+        style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.85)' }]} 
         activeOpacity={1} 
         onPress={onClose}
       >
@@ -64,71 +68,70 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.modalContainer}
           >
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, { backgroundColor: themeColors.background, borderColor: themeColors.border }]}>
               <View style={styles.header}>
-                <Text style={styles.headerTitle}>Edit Transaction</Text>
+                <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.editTx}</Text>
                 <TouchableOpacity onPress={onClose}>
-                  <Ionicons name="close" size={24} color="#666" />
+                  <Ionicons name="close" size={24} color={themeColors.textSecondary} />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Name</Text>
+                <Text style={styles.label}>{labels.home}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
                   value={title}
                   onChangeText={setTitle}
-                  placeholder="Transaction Title"
-                  placeholderTextColor="#444"
+                  placeholderTextColor={themeColors.textSecondary}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Amount</Text>
+                <Text style={styles.label}>{labels.currency}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: themeColors.card, borderColor: themeColors.border, color: themeColors.text }]}
                   value={amount}
                   onChangeText={setAmount}
                   placeholder="0.00"
-                  placeholderTextColor="#444"
+                  placeholderTextColor={themeColors.textSecondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Date</Text>
+                <Text style={styles.label}>{labels.stats}</Text>
                 <TouchableOpacity 
-                  style={styles.datePickerButton} 
+                  style={[styles.datePickerButton, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
                   onPress={() => setDatePickerVisibility(true)}
                 >
-                  <Text style={styles.dateValue}>{date}</Text>
-                  <Ionicons name="calendar-outline" size={18} color="#00AEEF" />
+                  <Text style={[styles.dateValue, { color: themeColors.text }]}>{date}</Text>
+                  <Ionicons name="calendar-outline" size={18} color={useFinanceStore().accentColor} />
                 </TouchableOpacity>
                 <DateTimePickerModal
                   isVisible={isDatePickerVisible}
                   mode="date"
                   onConfirm={handleConfirmDate}
                   onCancel={() => setDatePickerVisibility(false)}
-                  themeVariant="dark"
+                  themeVariant={themeMode === 'light' ? 'light' : 'dark'}
                 />
               </View>
 
               <View style={styles.actions}>
                 <TouchableOpacity 
-                  style={[styles.button, styles.deleteButton]} 
+                  style={[styles.button, styles.deleteButton, { backgroundColor: `${themeColors.border}50`, borderColor: themeColors.border }]} 
                   onPress={() => {
                     onDelete(transaction.id);
                     onClose();
                   }}
                 >
-                  <Text style={styles.deleteButtonText}>Delete</Text>
+                  <Text style={styles.deleteButtonText}>{labels.delete}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity 
-                  style={[styles.button, styles.saveButton]} 
+                  style={[styles.button, styles.saveButton, { backgroundColor: useFinanceStore().accentColor }]} 
                   onPress={handleSave}
                 >
-                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                  <Text style={styles.saveButtonText}>{labels.save}</Text>
                 </TouchableOpacity>
               </View>
             </View>

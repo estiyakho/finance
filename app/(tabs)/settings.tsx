@@ -1,18 +1,22 @@
-import React from 'react';
-import { StyleSheet, SectionList, TouchableOpacity, Alert, Switch, View as DefaultView } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, SectionList, TouchableOpacity, Switch, View as DefaultView, Platform } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Ionicons } from '@expo/vector-icons';
-import { useFinanceStore } from '@/store/useFinanceStore';
-
-const CURRENCIES = ['BDT', 'USD', 'EUR', 'GBP', 'INR', 'JPY'];
-const ACCENTS = ['#00AEEF', '#FF5252', '#4CAF50', '#FFD700', '#FF00FF', '#FFFFFF'];
+import { useFinanceStore, LABELS, ThemeMode } from '@/store/useFinanceStore';
+import Colors from '@/constants/Colors';
+import { 
+  CurrencyPickerModal, 
+  ColorPickerModal, 
+  LanguagePickerModal, 
+  ResetConfirmationModal 
+} from '@/components/PickerModals';
 
 interface SettingsItem {
   id: string;
   label: string;
   value?: string | boolean;
   icon: string;
-  type?: 'text' | 'toggle' | 'color' | 'danger';
+  type?: 'text' | 'toggle' | 'color' | 'danger' | 'choice';
   onPress?: () => void;
 }
 
@@ -24,76 +28,56 @@ interface SettingsSection {
 export default function SettingsScreen() {
   const { 
     currency, 
-    setCurrency, 
-    isAmoled, 
-    setAmoled, 
+    themeMode, 
+    setThemeMode, 
     accentColor, 
-    setAccentColor,
-    resetData 
+    language,
   } = useFinanceStore();
 
-  const handleCurrencyChange = () => {
-    Alert.alert(
-      "Select Currency",
-      "Choose your preferred currency",
-      CURRENCIES.map(curr => ({
-        text: curr,
-        onPress: () => setCurrency(curr)
-      })),
-      { cancelable: true }
-    );
-  };
+  const labels = LABELS[language];
 
-  const handleAccentChange = () => {
-    Alert.alert(
-      "Accent Color",
-      "Choose a theme accent",
-      ACCENTS.map(color => ({
-        text: color === accentColor ? `• ${color}` : color,
-        onPress: () => setAccentColor(color)
-      })),
-      { cancelable: true }
-    );
-  };
+  const [currencyVisible, setCurrencyVisible] = useState(false);
+  const [colorVisible, setColorVisible] = useState(false);
+  const [langVisible, setLangVisible] = useState(false);
+  const [resetVisible, setResetVisible] = useState(false);
 
-  const handleReset = () => {
-    Alert.alert(
-      "Reset All Data",
-      "This will permanently delete all transactions and settings. proceed?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Reset", style: "destructive", onPress: resetData }
-      ]
-    );
+  const themeColors = Colors[themeMode];
+
+  const handleThemeChange = () => {
+    const modes: ThemeMode[] = ['light', 'dark', 'amoled'];
+    const currentIndex = modes.indexOf(themeMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    setThemeMode(modes[nextIndex]);
   };
 
   const SETTINGS_SECTIONS: SettingsSection[] = [
     {
-      title: 'Appearance',
+      title: labels.appearance,
       data: [
-        { id: 'amoled', label: 'AMOLED Mode', type: 'toggle', value: isAmoled, icon: 'moon-outline' },
-        { id: 'accent', label: 'Accent Color', type: 'color', value: accentColor, icon: 'color-palette-outline', onPress: handleAccentChange },
+        { id: 'theme', label: labels.theme, value: themeMode.toUpperCase(), icon: 'sunny-outline', type: 'choice', onPress: handleThemeChange },
+        { id: 'accent', label: labels.accent, type: 'color', value: accentColor, icon: 'color-palette-outline', onPress: () => setColorVisible(true) },
       ],
     },
     {
-      title: 'Preferences',
+      title: labels.preferences,
       data: [
-        { id: 'currency', label: 'Currency', value: currency, icon: 'cash-outline', onPress: handleCurrencyChange, type: 'text' },
-        { id: 'format', label: 'Time Format', value: '12-Hour', icon: 'time-outline', type: 'text' },
+        { id: 'language', label: labels.language, value: language === 'en' ? 'English' : 'বাংলা', icon: 'language-outline', type: 'choice', onPress: () => setLangVisible(true) },
+        { id: 'currency', label: labels.currency, value: currency, icon: 'cash-outline', type: 'choice', onPress: () => setCurrencyVisible(true) },
       ],
     },
     {
-      title: 'Data & Privacy',
+      title: labels.dataPrivacy,
       data: [
-        { id: 'reset', label: 'Reset All Data', type: 'danger', icon: 'refresh-outline', onPress: handleReset },
+        { id: 'reset', label: labels.resetData, type: 'danger', icon: 'refresh-outline', onPress: () => setResetVisible(true) },
+        { id: 'reset', label: labels.resetData, type: 'danger', icon: 'trash-outline', onPress: () => setResetVisible(true) },
       ],
     },
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: '#000' }]}>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: accentColor }]}>Settings</Text>
+        <Text style={[styles.headerTitle, { color: accentColor }]}>{labels.settings}</Text>
       </View>
 
       <SectionList
@@ -101,54 +85,52 @@ export default function SettingsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity 
-            style={[styles.item, { backgroundColor: '#0A0A0A' }]} 
+            style={[styles.item, { backgroundColor: themeColors.card, borderColor: themeColors.border }]} 
             onPress={item.onPress}
-            disabled={item.type === 'toggle'}
             activeOpacity={0.7}
+            disabled={!item.onPress}
           >
             <View style={styles.itemLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? '#1E1414' : '#111' }]}>
+              <View style={[styles.iconContainer, { backgroundColor: item.type === 'danger' ? '#1E1414' : themeColors.backgroundSecondary }]}>
                 <Ionicons 
                   name={item.icon as any} 
                   size={18} 
-                  color={item.type === 'danger' ? '#FF5252' : item.type === 'color' ? accentColor : '#666'} 
+                  color={item.type === 'danger' ? '#FF5252' : item.type === 'color' ? accentColor : themeColors.textSecondary} 
                 />
               </View>
-              <Text style={[styles.itemLabel, item.type === 'danger' && styles.dangerText]}>
+              <Text style={[styles.itemLabel, { color: themeColors.text }, item.type === 'danger' && styles.dangerText]}>
                 {item.label}
               </Text>
             </View>
 
             <View style={styles.itemRight}>
-              {item.type === 'toggle' ? (
-                <Switch
-                  value={item.value as boolean}
-                  onValueChange={setAmoled}
-                  trackColor={{ false: '#333', true: accentColor }}
-                  thumbColor="#FFF"
-                />
-              ) : item.type === 'color' ? (
-                <View style={styles.colorValue}>
+              {item.type === 'color' ? (
+                <View style={styles.valueWrapper}>
                   <View style={[styles.colorDot, { backgroundColor: item.value as string }]} />
-                  <Ionicons name="chevron-forward" size={14} color="#333" />
+                  <Ionicons name="chevron-forward" size={14} color={themeColors.border} />
                 </View>
               ) : item.type === 'danger' ? (
-                <Ionicons name="chevron-forward" size={14} color="#333" />
+                <Ionicons name="chevron-forward" size={14} color={themeColors.border} />
               ) : (
-                <View style={styles.textValue}>
-                  <Text style={styles.itemValue}>{item.value}</Text>
-                  <Ionicons name="chevron-forward" size={14} color="#333" />
+                <View style={styles.valueWrapper}>
+                  <Text style={[styles.itemValue, { color: themeColors.textSecondary }]}>{item.value}</Text>
+                  <Ionicons name="chevron-forward" size={14} color={themeColors.border} />
                 </View>
               )}
             </View>
           </TouchableOpacity>
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
+          <Text style={[styles.sectionHeader, { color: themeColors.textSecondary }]}>{title}</Text>
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+
+      <CurrencyPickerModal visible={currencyVisible} onClose={() => setCurrencyVisible(false)} />
+      <ColorPickerModal visible={colorVisible} onClose={() => setColorVisible(false)} />
+      <LanguagePickerModal visible={langVisible} onClose={() => setLangVisible(false)} />
+      <ResetConfirmationModal visible={resetVisible} onClose={() => setResetVisible(false)} />
     </View>
   );
 }
@@ -158,10 +140,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingTop: 60,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 24,
     paddingBottom: 20,
-    backgroundColor: '#000',
   },
   headerTitle: {
     fontSize: 24,
@@ -169,12 +150,11 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 100,
+    paddingBottom: 40,
   },
   sectionHeader: {
     fontSize: 10,
     fontFamily: 'MartianMono-Bold',
-    color: '#444',
     marginTop: 24,
     marginBottom: 12,
     marginHorizontal: 8,
@@ -190,7 +170,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginVertical: 4,
     borderWidth: 1,
-    borderColor: '#111',
   },
   itemLeft: {
     flexDirection: 'row',
@@ -208,7 +187,6 @@ const styles = StyleSheet.create({
   itemLabel: {
     fontSize: 14,
     fontFamily: 'MartianMono',
-    color: '#EEE',
   },
   dangerText: {
     color: '#FF5252',
@@ -218,21 +196,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
-  textValue: {
+  valueWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
   itemValue: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'MartianMono',
-    color: '#666',
     marginRight: 6,
-  },
-  colorValue: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
   },
   colorDot: {
     width: 16,
