@@ -35,11 +35,31 @@ export default function TransactionsScreen() {
   const [deleteTransactionId, setDeleteTransactionId] = useState<string | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
+const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
+
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(t => 
+    let result = transactions.filter(t => 
       t.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [transactions, searchQuery]);
+
+    if (filterType !== 'all') {
+      result = result.filter(t => t.type === filterType);
+    }
+
+    result = [...result].sort((a, b) => {
+      if (sortBy === 'amount') {
+        return b.amount - a.amount;
+      } else {
+        // Default to date/time sort (newest first)
+        // Since we store date as strings, we might need to be careful, 
+        // but the addTransaction adds them in order.
+        return 0; // The store already keeps them in descending order of addition
+      }
+    });
+
+    return result;
+  }, [transactions, searchQuery, filterType, sortBy]);
 
   const handleAddTransaction = () => {
     setEditingTransaction({
@@ -83,6 +103,10 @@ export default function TransactionsScreen() {
     return transactions.find(t => t.id === deleteTransactionId)?.title || '';
   }, [transactions, deleteTransactionId]);
 
+  const toggleSort = () => {
+    setSortBy(prev => prev === 'date' ? 'amount' : 'date');
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background, paddingTop: insets.top }]}>
       <StatusBar 
@@ -91,10 +115,6 @@ export default function TransactionsScreen() {
         translucent={true}
       />
       
-      <View style={styles.topHeader}>
-        <Text style={[styles.headerTitle, { color: themeColors.text }]}>{labels.home}</Text>
-      </View>
-
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id}
@@ -131,6 +151,38 @@ export default function TransactionsScreen() {
               expense={getTotalExpense()}
               currency={currency}
             />
+
+            <View style={styles.filterSortRow}>
+              <View style={[styles.chipsContainer, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
+                {(['all', 'income', 'expense'] as const).map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.chip,
+                      filterType === type && { backgroundColor: accentColor }
+                    ]}
+                    onPress={() => setFilterType(type)}
+                  >
+                    <Text 
+                      style={[
+                        styles.chipText, 
+                        { color: filterType === type ? '#FFF' : themeColors.textSecondary }
+                      ]}
+                    >
+                      {labels[type]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.sortButton, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}
+                onPress={toggleSort}
+              >
+                <Ionicons name="swap-vertical" size={16} color={themeColors.textSecondary} />
+                <Text style={[styles.sortButtonText, { color: themeColors.textSecondary }]}>{labels.sort}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         }
         contentContainerStyle={styles.listContent}
@@ -163,15 +215,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  topHeader: {
-    paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 8,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontFamily: 'MartianMono-Bold',
-  },
   header: {
     paddingBottom: 12,
   },
@@ -192,6 +235,41 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: 'MartianMono',
     fontSize: 13,
+  },
+  filterSortRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: 'transparent',
+  },
+  chipsContainer: {
+    flexDirection: 'row',
+    borderRadius: 16,
+    padding: 4,
+    borderWidth: 1,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  chipText: {
+    fontSize: 11,
+    fontFamily: 'MartianMono-Bold',
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  sortButtonText: {
+    fontSize: 11,
+    fontFamily: 'MartianMono-Bold',
+    marginLeft: 6,
   },
   listContent: {
     paddingHorizontal: 16,

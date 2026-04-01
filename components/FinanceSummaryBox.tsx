@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 24,
   },
   balanceInfo: {
     flex: 1,

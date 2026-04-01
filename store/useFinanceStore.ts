@@ -74,6 +74,8 @@ export const LABELS: Record<Language, any> = {
     accent: 'Accent Color',
     light: 'Light',
     dark: 'Dark',
+    all: 'All',
+    sort: 'Sort',
   },
   bn: {
     home: 'হোম',
@@ -101,6 +103,8 @@ export const LABELS: Record<Language, any> = {
     accent: 'অ্যাকসেন্ট কালার',
     light: 'লাইট',
     dark: 'ডার্ক',
+    all: 'সব',
+    sort: 'সর্ট',
   }
 };
 
