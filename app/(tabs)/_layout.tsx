@@ -1,18 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
 
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
+  name: React.ComponentProps<typeof Ionicons>['name'];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <Ionicons size={24} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -22,13 +19,16 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#00AEEF',
-        tabBarInactiveTintColor: '#888',
+        tabBarInactiveTintColor: '#666',
+        tabBarShowLabel: true,
         tabBarStyle: {
-          backgroundColor: '#121212',
-          borderTopColor: '#222',
+          backgroundColor: '#000',
+          borderTopColor: '#111',
+          height: 60,
+          paddingBottom: 8,
         },
         headerStyle: {
-          backgroundColor: '#121212',
+          backgroundColor: '#000',
         },
         headerTitleStyle: {
           color: '#FFF',
@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           headerShown: false,
           tabBarLabel: 'Transactions',
-          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="receipt-outline" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -50,7 +50,7 @@ export default function TabLayout() {
         options={{
           title: 'Statistics',
           tabBarLabel: 'Stats',
-          tabBarIcon: ({ color }) => <TabBarIcon name="bar-chart" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="pie-chart-outline" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -58,7 +58,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarLabel: 'Settings',
-          tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="settings-outline" color={color} />,
         }}
       />
     </Tabs>
