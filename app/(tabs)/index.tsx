@@ -78,6 +78,7 @@ export default function TransactionsScreen() {
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       createdAt: Date.now(),
+      dateTimestamp: Date.now(),
     });
     setEditModalVisible(true);
   };
@@ -151,8 +152,6 @@ export default function TransactionsScreen() {
 
             <FinanceSummaryBox 
               balance={getTotalBalance()}
-              income={getTotalIncome()}
-              expense={getTotalExpense()}
               currency={currency}
             />
 

@@ -22,6 +22,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
+  const [dateTimestamp, setDateTimestamp] = useState<number>(Date.now());
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -32,6 +33,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       setTitle(transaction.id ? transaction.title : '');
       setAmount(transaction.id ? transaction.amount.toString() : '');
       setDate(transaction.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      setDateTimestamp(transaction.dateTimestamp || Date.now());
       setType(transaction.type || 'expense');
     }
   }, [transaction, visible]);
@@ -39,6 +41,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
   const handleConfirmDate = (selectedDate: Date) => {
     const formattedDate = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     setDate(formattedDate);
+    setDateTimestamp(selectedDate.getTime());
     setDatePickerVisibility(false);
   };
 
@@ -47,6 +50,7 @@ export default function EditTransactionModal({ visible, transaction, onClose, on
       title: title.trim() || 'Untitled',
       amount: amount ? parseFloat(amount) : 0,
       date,
+      dateTimestamp,
       type,
       time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
     });

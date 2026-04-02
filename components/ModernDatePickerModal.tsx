@@ -98,6 +98,14 @@ export default function ModernDatePickerModal({ visible, onClose, onConfirm, cur
     return columns;
   };
 
+  // Fill to 42 cells (6 weeks) to keep consistent height
+  const allColumns = renderDays();
+  const totalCells = allColumns.length;
+  const paddedColumns = [...allColumns];
+  for (let i = totalCells; i < 42; i++) {
+      paddedColumns.push(<DefaultView key={`empty-suffix-${i}`} style={styles.dayCell} />);
+  }
+
   return (
     <CoreModal visible={visible} onClose={onClose} title={labels.txDate || 'Date'}>
       <DefaultView style={styles.container}>
@@ -125,7 +133,7 @@ export default function ModernDatePickerModal({ visible, onClose, onConfirm, cur
 
         {/* Calendar Grid */}
         <DefaultView style={styles.daysGrid}>
-          {renderDays()}
+          {paddedColumns}
         </DefaultView>
 
         {/* Quick Actions */}

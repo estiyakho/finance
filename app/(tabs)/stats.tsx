@@ -83,7 +83,7 @@ export default function StatsScreen() {
 
   const monthlyTransactions = useMemo(() => {
     return transactions.filter(t => {
-      const d = new Date(t.createdAt || 0);
+      const d = new Date(t.dateTimestamp || t.createdAt || 0);
       return d.getFullYear() === selectedMonth.year && d.getMonth() === selectedMonth.month;
     });
   }, [transactions, selectedMonth]);
@@ -115,7 +115,7 @@ export default function StatsScreen() {
   };
 
   const renderTransactionSimple = ({ item }: { item: Transaction }) => {
-    const dateObj = new Date(item.createdAt || 0);
+    const dateObj = new Date(item.dateTimestamp || item.createdAt || 0);
     const day = dateObj.getDate();
     const amountColor = item.type === 'income' ? incomeColor : expenseColor;
 

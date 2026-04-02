@@ -43,6 +43,7 @@ export interface Transaction {
   date: string;
   time: string;
   createdAt: number;
+  dateTimestamp: number;
 }
 
 export type ThemeMode = 'light' | 'dark' | 'amoled';
@@ -162,7 +163,12 @@ export const useFinanceStore = create<FinanceState>()(
       language: 'en',
       addTransaction: (transaction) => set((state) => ({
         transactions: [
-          { ...transaction, id: Math.random().toString(36).substring(7), createdAt: Date.now() },
+          { 
+            ...transaction, 
+            id: Math.random().toString(36).substring(7), 
+            createdAt: Date.now(),
+            dateTimestamp: transaction.dateTimestamp || Date.now()
+          },
           ...state.transactions
         ]
       })),

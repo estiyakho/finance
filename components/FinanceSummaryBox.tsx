@@ -5,8 +5,8 @@ import { StyleSheet, Text, View } from 'react-native';
 
 interface FinanceSummaryBoxProps {
   balance: number;
-  income: number;
-  expense: number;
+  income?: number;
+  expense?: number;
   currency: string;
 }
 
@@ -28,19 +28,22 @@ export default function FinanceSummaryBox({ balance, income, expense, currency }
         </View>
       </View>
 
-      <View style={[styles.divider, { backgroundColor: themeColors.border }]} />
-
-      <View style={styles.bottomSection}>
-        <View style={styles.statBox}>
-          <Text style={[styles.statAmount, { color: incomeColor }]}>{income.toLocaleString()}</Text>
-          <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.income}</Text>
-        </View>
-        <View style={[styles.verticalDivider, { backgroundColor: themeColors.border }]} />
-        <View style={styles.statBox}>
-          <Text style={[styles.statAmount, { color: expenseColor }]}>{expense.toLocaleString()}</Text>
-          <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.expense}</Text>
-        </View>
-      </View>
+      {income !== undefined && expense !== undefined && (
+        <>
+          <View style={[styles.divider, { backgroundColor: themeColors.border }]} />
+          <View style={styles.bottomSection}>
+            <View style={styles.statBox}>
+              <Text style={[styles.statAmount, { color: incomeColor }]}>{income.toLocaleString()}</Text>
+              <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.income}</Text>
+            </View>
+            <View style={[styles.verticalDivider, { backgroundColor: themeColors.border }]} />
+            <View style={styles.statBox}>
+              <Text style={[styles.statAmount, { color: expenseColor }]}>{expense.toLocaleString()}</Text>
+              <Text style={[styles.statLabel, { color: themeColors.textSecondary }]}>{labels.expense}</Text>
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 }

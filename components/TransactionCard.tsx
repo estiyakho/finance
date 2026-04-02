@@ -22,7 +22,10 @@ export default function TransactionCard({ title, amount, date, type, currency }:
   return (
     <View style={[styles.container, { backgroundColor: themeColors.card, borderColor: themeColors.border }]}>
       <View style={styles.leftSection}>
-        <View style={[styles.radioPlaceholder, { borderColor: themeColors.border }]} />
+        <View style={[
+          styles.statusDot, 
+          { backgroundColor: type === 'income' ? incomeColor : expenseColor }
+        ]} />
         <View style={styles.textContainer}>
           <Text style={[styles.title, { color: themeColors.text }]}>{title}</Text>
           <Text style={[styles.dateText, { color: themeColors.textSecondary }]}>{date}</Text>
@@ -31,7 +34,7 @@ export default function TransactionCard({ title, amount, date, type, currency }:
 
       <View style={styles.rightSection}>
         <Text style={[styles.amount, { color: amountColor }]}>
-          {amount.toLocaleString()}
+          {Math.abs(amount).toLocaleString()}
         </Text>
       </View>
     </View>
@@ -54,12 +57,11 @@ const styles = StyleSheet.create({
     flex: 2,
     backgroundColor: 'transparent',
   },
-  radioPlaceholder: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    marginRight: 14,
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 16,
   },
   textContainer: {
     flex: 1,
